@@ -71,7 +71,7 @@ microservices-assignment-starter/
 - [ ] Update `architecture.md` to describe your system components.
 - [ ] Define all APIs using OpenAPI YAML in `docs/api-specs/`.
 - [ ] Implement business logic in `service-a` and `service-b`.
-- [ ] Configure API Gateway routing logic in `gateway.py`.
+- [ ] Configure API Gateway
 - [ ] Ensure services can communicate internally using service names (Docker Compose handles networking).
 
 ---
@@ -88,7 +88,7 @@ microservices-assignment-starter/
 Please make sure:
 - `README.md` is updated with service descriptions and API usage, following standard README conventions (e.g., clear structure, usage instructions, and contribution guidelines).
 - Include a list of team members and their contributions in the `README.md`.
-- All your code should **runnable with one command**: `docker-compose up`.
+- All your code should be **runnable with one command**: `docker-compose up`.
 
 
 
