@@ -24,9 +24,11 @@ microservices-assignment-starter/
 │   ├── service-a/
 │   │   ├── Dockerfile
 │   │   └── src/
+│   │   └── readme.md               # Service A instructions and description
 │   └── service-b/
 │       ├── Dockerfile
 │       └── src/
+│   │   └── readme.md               # Service B instructions and description
 └── gateway/                        # API Gateway / reverse proxy
     ├── Dockerfile
     └── src/
