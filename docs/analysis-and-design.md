@@ -33,6 +33,9 @@ Design the services to support the business process.
 - **Service Capabilities**: Define the core functions each service provides.
 - **Interactions**: Describe how services collaborate to complete the process.
 - **Data Ownership**: Specify which service owns what data.
-- **API Specs**: Complete API definitions in `docs/api-specs/service-a.yaml` and `docs/api-specs/service-b.yaml`.
 
----
+
+## 4. API Specs: 
+- **Complete API definitions** in `docs/api-specs/`.
+
+```
