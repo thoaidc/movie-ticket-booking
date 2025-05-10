@@ -29,9 +29,14 @@ microservices-assignment-starter/
 │       ├── Dockerfile
 │       └── src/
 │   │   └── readme.md               # Service B instructions and description
+└── frontend/                       # API Gateway / reverse proxy
+    ├── Dockerfile
+    └── src/
+    └── readme.md                   # Frontend instructions and description
 └── gateway/                        # API Gateway / reverse proxy
     ├── Dockerfile
     └── src/
+    └── readme.md                   # API gateway instructions and description
 
 
 ```
@@ -100,7 +105,4 @@ This template was created by Hung Dang.
 
 
 Good luck! 💪🚀
-
-
-
 
