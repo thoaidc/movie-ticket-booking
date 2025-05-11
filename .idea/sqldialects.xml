@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/services/customer-service/dbchangelog/init_db.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/services/movie-service/dbchangelog/init_db.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/services/notification-service/dbchangelog/init_db.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/services/payment-service/dbchangelog/init_db.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/services/seat-availability-service/dbchangelog/init_db.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/services/ticket-booking-service/dbchangelog/init_db.sql" dialect="MySQL" />
+  </component>
+</project>
