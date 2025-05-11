@@ -1,12 +1,13 @@
-package com.dct.nextgen.exception;
+package vn.ptit.moviebooking.exception;
 
+@SuppressWarnings("unused")
 public class BaseBadRequestAlertException extends BaseException {
 
-    public BaseBadRequestAlertException(String entityName, String errorKey) {
-        super(entityName, errorKey, null, null);
+    public BaseBadRequestAlertException(String entityName, String message) {
+        super(entityName, message, null);
     }
 
-    public BaseBadRequestAlertException(String entityName, String errorKey, Object[] args, Throwable error) {
-        super(entityName, errorKey, args, error);
+    public BaseBadRequestAlertException(String entityName, String message, Throwable error) {
+        super(entityName, message, error);
     }
 }

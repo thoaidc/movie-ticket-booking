@@ -1,12 +1,13 @@
-package com.dct.nextgen.exception;
+package vn.ptit.moviebooking.exception;
 
+@SuppressWarnings("unused")
 public class BaseAuthenticationException extends BaseException {
 
-    public BaseAuthenticationException(String entityName, String errorKey) {
-        super(entityName, errorKey, null, null);
+    public BaseAuthenticationException(String entityName, String message) {
+        super(entityName, message, null);
     }
 
-    public BaseAuthenticationException(String entityName, String errorKey, Object[] args, Throwable error) {
-        super(entityName, errorKey, args, error);
+    public BaseAuthenticationException(String entityName, String message, Throwable error) {
+        super(entityName, message, error);
     }
 }
