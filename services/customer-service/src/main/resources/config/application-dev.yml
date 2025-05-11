@@ -11,8 +11,8 @@ logging:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/nextgen_brand?serverTimezone=UTC
-    username: admin-nextgen-brand
+    url: jdbc:mysql://localhost:3306/hdv_customer?serverTimezone=UTC
+    username: admin_hdv_customer
     password: 123456a@
 
   jpa:
