@@ -1,5 +1,7 @@
 package vn.ptit.moviebooking.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vn.ptit.moviebooking.constants.SecurityConstants;
 
 import org.springframework.context.annotation.Bean;
@@ -13,6 +15,8 @@ import java.util.List;
 @Configuration
 public class InterceptorConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(InterceptorConfig.class);
+
     /**
      * Configures the CORS (Cross-Origin Resource Sharing) filter in the application <p>
      * CORS is a security mechanism that allows or denies requests between different origins <p>
@@ -20,6 +24,7 @@ public class InterceptorConfig {
      */
     @Bean
     public CorsFilter corsFilter() {
+        log.debug("Configure default CorsFilter");
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOriginPatterns(List.of(SecurityConstants.CORS.ALLOWED_ORIGIN_PATTERNS));

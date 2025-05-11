@@ -25,4 +25,4 @@ spring:
       mode: never
 
 server:
-  port: 8100
+  port: 8103
