@@ -1,0 +1,21 @@
+logging:
+  level:
+    root: debug
+    vn.ptit.moviebooking: debug
+  charset:
+    console: UTF-8
+    file: UTF-8
+  # Custom properties to define logs file paths according to different profiles
+  file-path: mnt/logs
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/hdv_seat_movie?serverTimezone=UTC
+    username: admin_hdv_seat_movie
+    password: 123456a@
+
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
