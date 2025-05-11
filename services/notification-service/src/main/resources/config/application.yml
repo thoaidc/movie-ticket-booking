@@ -1,0 +1,28 @@
+
+spring:
+  application:
+    name: notification-service
+  profiles:
+    active: "@profiles.active@"
+
+  jpa:
+    open-in-view: false
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: false
+        jdbc:
+          time_zone: UTC
+          ddl-auto: validate
+        hibernate:
+          # Hibernate only checks if the current schema matches the entity
+          # If it does not match, the application will not start
+          # Do not make any changes to the schema
+          ddl-auto: validate
+  sql:
+    init:
+      mode: never
+
+server:
+  port: 8102
