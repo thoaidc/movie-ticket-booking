@@ -10,7 +10,7 @@ USE `hdv_movie`;
 DROP TABLE IF EXISTS `cinema`;
 CREATE TABLE `cinema` (
     `id` int NOT NULL AUTO_INCREMENT,
-    `name` varchar(45) NOT NULL,
+    `name` varchar(45) NOT NULL UNIQUE,
     `address` varchar(255) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -43,26 +43,27 @@ CREATE TABLE `movie` (
 
 DROP TABLE IF EXISTS `show`;
 CREATE TABLE `show` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `movie_id` int NOT NULL,
-  `cinema_room_id` int NOT NULL,
-  `ticket_price` DECIMAL(10,2) NOT NULL,
-  `status` ENUM('ACTIVE', 'CANCELLED', 'COMPLETED') NOT NULL DEFAULT 'ACTIVE',
-  `start_time` timestamp not null,
-  `end_time` timestamp not null,
-  PRIMARY KEY (`id`),
-  CONSTRAINT fk_show_movie FOREIGN KEY (movie_id) REFERENCES movie(id),
-  CONSTRAINT fk_show_cinema_room FOREIGN KEY (cinema_room_id) REFERENCES cinema_room(id),
-  INDEX idx_show_movie (movie_id),
-  INDEX idx_show_cinema_room (cinema_room_id),
-  INDEX idx_show_status (status)
+    `id` int NOT NULL AUTO_INCREMENT,
+    `movie_id` int NOT NULL,
+    `cinema_room_id` int NOT NULL,
+    `ticket_price` DECIMAL(10,2) NOT NULL,
+    `status` ENUM('ACTIVE', 'CANCELLED', 'COMPLETED') NOT NULL DEFAULT 'ACTIVE',
+    `start_time` timestamp not null,
+    `end_time` timestamp not null,
+    PRIMARY KEY (`id`),
+    CONSTRAINT fk_show_movie FOREIGN KEY (movie_id) REFERENCES movie(id),
+    CONSTRAINT fk_show_cinema_room FOREIGN KEY (cinema_room_id) REFERENCES cinema_room(id),
+    INDEX idx_show_movie (movie_id),
+    INDEX idx_show_cinema_room (cinema_room_id),
+    INDEX idx_show_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `seat` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `cinema_room_id` INT NOT NULL,
-    `seat_number` VARCHAR(10) NOT NULL,
-    `seat_row` VARCHAR(10) NOT NULL,
+    `seat_number` INT NOT NULL,
+    `seat_row` INT NOT NULL,
+    `code` VARCHAR(10) NOT NULL,
     `status` ENUM('AVAILABLE', 'BOOKED') NOT NULL DEFAULT 'AVAILABLE',
     CONSTRAINT fk_seat_room FOREIGN KEY (cinema_room_id) REFERENCES cinema_room(id) ON DELETE CASCADE,
     INDEX idx_seat_room (cinema_room_id),

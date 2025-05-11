@@ -31,16 +31,3 @@ CREATE TABLE `booking_seat` (
     UNIQUE KEY uk_booking_seat (booking_id, seat_id),
     INDEX idx_booking_item_booking (booking_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE BookingHistory (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `customer_id` BIGINT NOT NULL,
-    `booking_id` BIGINT NOT NULL,
-    `action` VARCHAR(100) NOT NULL,
-    `action_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `action_by` VARCHAR(255) NOT NULL,
-    CONSTRAINT fk_booking_history_booking FOREIGN KEY (booking_id) REFERENCES booking(id) ON DELETE CASCADE,
-    INDEX idx_booking_history_customer (customer_id),
-    INDEX idx_booking_history_booking (booking_id),
-    INDEX idx_booking_history_date (action_date)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
