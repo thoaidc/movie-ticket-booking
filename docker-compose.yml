@@ -108,7 +108,7 @@ services:
     image: mysql:8.0.40-oracle
     container_name: hdv-db-initializer
     volumes:
-      - ./scripts:/scripts
+      - ./scripts:/scripts  # Mount the ./scripts directory from the project to docker container
     command: "bash /scripts/init.sh"
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -131,14 +131,11 @@ services:
 
   # API Gateway
   hdv-api-gateway:
-    image: hdv-api-gateway:1.0.0
     container_name: hdv-api-gateway
     build: ./gateway
     ports:
       - "8080:8080"
     environment:
-      SPRING_APPLICATION_NAME: hdv-api-gateway
-      SERVER_PORT: 8080
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
     depends_on:
       - hdv-service-registry
@@ -148,23 +145,18 @@ services:
 
   # Service Discovery
   hdv-service-registry:
-    image: hdv-service-registry:1.0.0
     container_name: hdv-service-registry
     build: ./services/discovery-service
     ports:
       - "8761:8761"
     environment:
-      SPRING_APPLICATION_NAME: hdv-service-registry
-      SERVER_PORT: 8761
-      EUREKA_CLIENT_REGISTER-WITH-EUREKA: 'false'
-      EUREKA_CLIENT_FETCH-REGISTRY: 'false'
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
     networks:
       - hdv-network
     restart: unless-stopped
 
   # Microservices
   hdv-customer-service:
-    image: hdv-customer-service:1.0.0
     container_name: hdv-customer-service
     build: ./services/customer-service
     environment:
@@ -180,7 +172,6 @@ services:
     restart: unless-stopped
 
   hdv-movie-service:
-    image: hdv-movie-service:1.0.0
     container_name: hdv-movie-service
     build: ./services/movie-service
     environment:
@@ -196,7 +187,6 @@ services:
     restart: unless-stopped
 
   hdv-notification-service:
-    image: hdv-notification-service:1.0.0
     container_name: hdv-notification-service
     build: ./services/notification-service
     environment:
@@ -212,7 +202,6 @@ services:
     restart: unless-stopped
 
   hdv-payment-service:
-    image: hdv-payment-service:1.0.0
     container_name: hdv-payment-service
     build: ./services/payment-service
     environment:
@@ -228,7 +217,6 @@ services:
     restart: unless-stopped
 
   hdv-seat-availability-service:
-    image: hdv-seat-availability-service:1.0.0
     container_name: hdv-seat-availability-service
     build: ./services/seat-availability-service
     environment:
@@ -244,7 +232,6 @@ services:
     restart: unless-stopped
 
   hdv-ticket-booking-service:
-    image: hdv-ticket-booking-service:1.0.0
     container_name: hdv-ticket-booking-service
     build: ./services/ticket-booking-service
     environment:
