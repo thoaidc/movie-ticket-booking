@@ -1,5 +1,32 @@
 
 services:
+  # Service Discovery
+  hdv-service-registry:
+    container_name: hdv-service-registry
+    build: ./services/discovery-service
+    ports:
+      - "8761:8761"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    networks:
+      - hdv-network
+    restart: unless-stopped
+
+  # API Gateway
+  hdv-api-gateway:
+    container_name: hdv-api-gateway
+    build: ./gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-service-registry:
+        condition: service_started
+    networks:
+      - hdv-network
+    restart: unless-stopped
+
   # MySQL database for each service
   hdv-customer-db:
     image: mysql:8.0.40-oracle
@@ -129,32 +156,6 @@ services:
       - hdv-network
     restart: "no"  # Run once and then stop
 
-  # API Gateway
-  hdv-api-gateway:
-    container_name: hdv-api-gateway
-    build: ./gateway
-    ports:
-      - "8080:8080"
-    environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
-    depends_on:
-      - hdv-service-registry
-    networks:
-      - hdv-network
-    restart: unless-stopped
-
-  # Service Discovery
-  hdv-service-registry:
-    container_name: hdv-service-registry
-    build: ./services/discovery-service
-    ports:
-      - "8761:8761"
-    environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
-    networks:
-      - hdv-network
-    restart: unless-stopped
-
   # Microservices
   hdv-customer-service:
     container_name: hdv-customer-service
@@ -165,7 +166,7 @@ services:
     depends_on:
       hdv-customer-db:
         condition: service_healthy
-      hdv-service-registry:
+      hdv-api-gateway:
         condition: service_started
     networks:
       - hdv-network
@@ -180,7 +181,7 @@ services:
     depends_on:
       hdv-movie-db:
         condition: service_healthy
-      hdv-service-registry:
+      hdv-api-gateway:
         condition: service_started
     networks:
       - hdv-network
@@ -195,7 +196,7 @@ services:
     depends_on:
       hdv-notification-db:
         condition: service_healthy
-      hdv-service-registry:
+      hdv-api-gateway:
         condition: service_started
     networks:
       - hdv-network
@@ -210,7 +211,7 @@ services:
     depends_on:
       hdv-payment-db:
         condition: service_healthy
-      hdv-service-registry:
+      hdv-api-gateway:
         condition: service_started
     networks:
       - hdv-network
@@ -225,7 +226,7 @@ services:
     depends_on:
       hdv-seat-movie-db:
         condition: service_healthy
-      hdv-service-registry:
+      hdv-api-gateway:
         condition: service_started
     networks:
       - hdv-network
@@ -240,7 +241,7 @@ services:
     depends_on:
       hdv-ticket-booking-db:
         condition: service_healthy
-      hdv-service-registry:
+      hdv-api-gateway:
         condition: service_started
     networks:
       - hdv-network
@@ -256,7 +257,10 @@ services:
 #    environment:
 #      API_GATEWAY_URL: http://hdv-api-gateway:8080
 #    depends_on:
-#      - hdv-api-gateway
+#      hdv-service-registry:
+#        condition: service_started
+#      hdv-api-gateway:
+#        condition: service_started
 #    networks:
 #      - hdv-network
 #    restart: unless-stopped
