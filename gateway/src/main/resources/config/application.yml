@@ -55,16 +55,6 @@ spring:
   lifecycle:
     timeout-per-shutdown-phase: 10s
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
-    registerWithEureka: true
-    fetchRegistry: true
-  instance:
-    preferIpAddress: true
-    instanceId: ${spring.application.name}:${server.port}
-
 management:
   endpoints:
     web:

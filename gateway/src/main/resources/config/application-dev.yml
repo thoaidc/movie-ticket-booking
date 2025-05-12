@@ -7,3 +7,13 @@ logging:
     file: UTF-8
   # Custom properties to define logs file paths according to different profiles
   file-path: mnt/logs
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
+  instance:
+    preferIpAddress: true
+    instanceId: ${spring.application.name}:${server.port}
