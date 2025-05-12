@@ -32,6 +32,7 @@ eureka:
   instance:
     preferIpAddress: true
     leaseRenewalIntervalInSeconds: 30  # Heartbeat sending frequency
+    instanceId: ${spring.application.name}:${server.port}
 
 management:
   endpoints:

@@ -53,6 +53,23 @@
     <logger name="com.zaxxer.hikari.pool.PoolBase" level="INFO" additivity="false">
         <appender-ref ref="CONNECTION_POOL_FILE"/>
     </logger>
+
+    <!-- Logger configuration for the API Gateway to reduce unnecessary logging -->
+    <logger name="org.springframework.cloud" level="WARN"/>
+    <logger name="org.springframework.boot.actuate" level="WARN"/>
+    <logger name="org.springframework.web.reactive.function.client" level="WARN"/>
+    <logger name="reactor.netty" level="WARN"/>
+    <logger name="io.netty" level="WARN"/>
+
+    <!-- Logger configuration for the Service Discovery (Eureka) to reduce unnecessary logging -->
+    <logger name="com.netflix.eureka" level="WARN"/>
+    <logger name="com.netflix.eureka.registry.AbstractInstanceRegistry" level="WARN"/>
+    <logger name="com.netflix.eureka.registry.PeerAwareInstanceRegistryImpl" level="WARN"/>
+    <logger name="com.netflix.eureka.DefaultEurekaServerContext" level="WARN"/>
+    <logger name="com.netflix.discovery" level="WARN"/>
+    <logger name="com.netflix.discovery.provider.DiscoveryJerseyProvider" level="WARN"/>
+    <logger name="com.netflix.discovery.DiscoveryClient" level="WARN"/>
+
     <logger name="ch.qos.logback" level="ERROR"/>
     <logger name="javax.activation" level="WARN"/>
     <logger name="javax.mail" level="WARN"/>

@@ -63,7 +63,7 @@ eureka:
     fetchRegistry: true
   instance:
     preferIpAddress: true
-    instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    instanceId: ${spring.application.name}:${server.port}
 
 management:
   endpoints:
