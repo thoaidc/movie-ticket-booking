@@ -1,52 +1,108 @@
-# 🎟️ Movie Ticket Booking System
+# 🧩 Microservices Assignment Starter Template
 
-This project implements a movie ticket booking system using a service-oriented architecture (SOA), designed to simulate the workflow of booking, payment, and confirmation of movie tickets.
-
----
-
-## 🧩 System Architecture Overview
-
-### 🧭 Task Service
-- **Ticket Booking Service**  
-  Handles the entire ticket booking process: from movie selection, seat selection, customer information verification, payment, to final confirmation notification.
-
-### 📦 Entity Services
-- **Movie Service**  
-  Manages movie data, showtimes, and seat availability.
-
-- **Customer Service**  
-  Manages customer information and booking verification.
-
-- **Payment Service**  
-  Handles online payment processing for movie tickets.
-
-### 🧠 Microservice
-- **Seat Availability Service**  
-  Verifies current seat availability before confirming the booking.
-
-### 🛎️ Utility Service
-- **Notification Service**  
-  Sends email confirmation to customers after successful booking and payment.
+This repository is a **starter template** for building a microservices-based system. Use it as a base for your group assignment.
 
 ---
 
-## 👥 Team Members & Contributions
+## 📁 Folder Structure
 
-| Name                  | Role                | Contributions                                                                                                  |
-|-----------------------|---------------------|----------------------------------------------------------------------------------------------------------------|
-| **Nguyễn Thế Dũng**   | Backend Developer   | - Implemented **Movie Service** and **Payment Service**                                                        |
-| **Đàm Công Thoại**    | Fullstack Developer | - Built **Ticket Booking Service** and integrated it with all other services<br>- Developed basic frontend UI  |
-| **Nguyễn Đắc Phong**  | Backend Developer   | - Developed **Notification Service** and **Customer Service**                                                  |
+```
+microservices-assignment-starter/
+├── README.md                       # This instruction file
+├── .env.example                    # Example environment variables
+├── docker-compose.yml              # Multi-container setup for all services
+├── docs/                           # Documentation folder
+│   ├── architecture.md             # Describe your system design here
+│   ├── analysis-and-design.md      # Document system analysis and design details
+│   ├── asset/                      # Store images, diagrams, or other visual assets for documentation
+│   └── api-specs/                  # API specifications in OpenAPI (YAML)
+│       ├── service-a.yaml
+│       └── service-b.yaml
+├── scripts/                        # Utility or deployment scripts
+│   └── init.sh
+├── services/                       # Application microservices
+│   ├── service-a/
+│   │   ├── Dockerfile
+│   │   └── src/
+│   │   └── readme.md               # Service A instructions and description
+│   └── service-b/
+│       ├── Dockerfile
+│       └── src/
+│   │   └── readme.md               # Service B instructions and description
+└── frontend/                       # API Gateway / reverse proxy
+    ├── Dockerfile
+    └── src/
+    └── readme.md                   # Frontend instructions and description
+└── gateway/                        # API Gateway / reverse proxy
+    ├── Dockerfile
+    └── src/
+    └── readme.md                   # API gateway instructions and description
 
+
+```
 
 ---
 
-## 🚀 How to Run
+## 🚀 Getting Started
 
-### Prerequisites
-- Docker
-- Docker Compose
+1. **Clone this repository**
 
-### Run with one command:
-```bash
-docker-compose up
+   ```bash
+   git clone https://github.com/hungdn1701/microservices-assignment-starter.git
+   cd microservices-assignment-starter
+   ```
+
+2. **Copy environment file**
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Run with Docker Compose**
+
+   ```bash
+   docker-compose up --build
+   ```
+---
+
+## 🧪 Development Notes
+
+- Use `docs/api-specs/*.yaml` to document REST APIs using OpenAPI format (Swagger).
+
+---
+
+## 📚 Recommended Tasks
+- [ ] Document system analysis and design in `analysis-and-design.md` as the first step
+- [ ] Update `architecture.md` to describe your system components.
+- [ ] Define all APIs using OpenAPI YAML in `docs/api-specs/`.
+- [ ] Implement business logic in `service-a` and `service-b`.
+- [ ] Configure API Gateway
+- [ ] Ensure services can communicate internally using service names (Docker Compose handles networking).
+
+---
+
+## 📌 Notes
+
+- Use Git branches for team collaboration.
+- Commit early, commit often!
+
+---
+
+## 👩‍🏫 Assignment Submission
+
+Please make sure:
+- `README.md` is updated with service descriptions and API usage, following standard README conventions (e.g., clear structure, usage instructions, and contribution guidelines).
+- Include a list of team members and their contributions in the `README.md`.
+- All your code should be **runnable with one command**: `docker-compose up`.
+
+
+
+## Author
+
+This template was created by Hung Dang.
+- Email: hungdn@ptit.edu.vn
+- GitHub: hungdn1701
+
+
+Good luck! 💪🚀
+
