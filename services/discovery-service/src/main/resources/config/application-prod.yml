@@ -7,3 +7,7 @@ logging:
     file: UTF-8
   # Custom properties to define logs file paths according to different profiles
   file-path: /mnt/logs
+
+eureka:
+  server:
+    enableSelfPreservation: true

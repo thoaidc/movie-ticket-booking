@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 spring:
   application:
     name: api-gateway
@@ -10,15 +7,73 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true
+          enabled: true  # Automatically create routes from service discovery
           lower-case-service-id: true
       routes:
         - id: customer-service
           uri: lb://customer-service
           predicates:
-            - Path=/customers/**
+            - Path=/api/customers/**
+          filters:
+            - RewritePath=/api/customers/(?<segment>.*), /api/customers/${segment}
+
+        - id: movie-service
+          uri: lb://movie-service
+          predicates:
+            - Path=/api/movies/**
+          filters:
+            - RewritePath=/api/movies/(?<segment>.*), /api/movies/${segment}
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - RewritePath=/api/notifications/(?<segment>.*), /api/notifications/${segment}
+
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payments/**
+          filters:
+            - RewritePath=/api/payments/(?<segment>.*), /api/payments/${segment}
+
+        - id: seat-availability-service
+          uri: lb://seat-availability-service
+          predicates:
+            - Path=/api/seats/availabilities/**
+          filters:
+            - RewritePath=/api/seats/availabilities/(?<segment>.*), /api/seats/availabilities/${segment}
+
+        - id: ticket-booking-service
+          uri: lb://ticket-booking-service
+          predicates:
+            - Path=/api/tickets/booking/**
+          filters:
+            - RewritePath=/api/tickets/booking/(?<segment>.*), /api/tickets/booking/${segment}
+
+  lifecycle:
+    timeout-per-shutdown-phase: 10s
 
 eureka:
   client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    registerWithEureka: true
+    fetchRegistry: true
+  instance:
+    preferIpAddress: true
+    instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway,health,info
+  endpoint:
+    health:
+      show-details: always
+
+server:
+  port: 8080
+  shutdown: graceful
