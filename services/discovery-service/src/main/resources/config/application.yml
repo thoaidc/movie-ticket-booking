@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: eureka-server
+  profiles:
+    active: "@profiles.active@"
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+  server:
+    waitTimeInMsWhenSyncEmpty: 0
+
+server:
+  port: 8761
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

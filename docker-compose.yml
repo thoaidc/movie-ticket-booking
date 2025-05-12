@@ -1,16 +1,280 @@
-version: '3.8'
+
 services:
-  service-a:
-    build: ./services/service-a
+  # Service Discovery
+  hdv-service-registry:
+    container_name: hdv-service-registry
+    build: ./services/discovery-service
     ports:
-      - "5001:5000"
+      - "8761:8761"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    networks:
+      - hdv-network
+    restart: unless-stopped
 
-  service-b:
-    build: ./services/service-b
-    ports:
-      - "5002:5000"
-
-  gateway:
+  # API Gateway
+  hdv-api-gateway:
+    container_name: hdv-api-gateway
     build: ./gateway
     ports:
-      - "8080:8000"
+      - "8080:8080"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-service-registry:
+        condition: service_started
+    networks:
+      - hdv-network
+    restart: unless-stopped
+
+  # MySQL database for each service
+  hdv-customer-db:
+    image: mysql:8.0.40-oracle
+    container_name: hdv-customer-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hdv_customer
+    volumes:
+      - hdv_customer_data:/var/lib/mysql
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hdv-movie-db:
+    image: mysql:8.0.40-oracle
+    container_name: hdv-movie-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hdv_movie
+    volumes:
+      - hdv_movie_data:/var/lib/mysql
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hdv-notification-db:
+    image: mysql:8.0.40-oracle
+    container_name: hdv-notification-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hdv_notification
+    volumes:
+      - hdv_notification_data:/var/lib/mysql
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hdv-payment-db:
+    image: mysql:8.0.40-oracle
+    container_name: hdv-payment-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hdv_payment
+    volumes:
+      - hdv_payment_data:/var/lib/mysql
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hdv-seat-movie-db:
+    image: mysql:8.0.40-oracle
+    container_name: hdv-seat-movie-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hdv_seat_movie
+    volumes:
+      - hdv_seat_movie_data:/var/lib/mysql
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hdv-ticket-booking-db:
+    image: mysql:8.0.40-oracle
+    container_name: hdv-ticket-booking-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hdv_ticket_booking
+    volumes:
+      - hdv_ticket_booking_data:/var/lib/mysql
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Schema generation service for databases
+  hdv-db-initializer:
+    image: mysql:8.0.40-oracle
+    container_name: hdv-db-initializer
+    volumes:
+      - ./scripts:/scripts  # Mount the ./scripts directory from the project to docker container
+    command: "bash /scripts/init.sh"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      hdv-customer-db:
+        condition: service_healthy
+      hdv-movie-db:
+        condition: service_healthy
+      hdv-notification-db:
+        condition: service_healthy
+      hdv-payment-db:
+        condition: service_healthy
+      hdv-seat-movie-db:
+        condition: service_healthy
+      hdv-ticket-booking-db:
+        condition: service_healthy
+    networks:
+      - hdv-network
+    restart: "no"  # Run once and then stop
+
+  # Microservices
+  hdv-customer-service:
+    container_name: hdv-customer-service
+    build: ./services/customer-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-customer-db:3306/hdv_customer?useSSL=false&allowPublicKeyRetrieval=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-customer-db:
+        condition: service_healthy
+      hdv-api-gateway:
+        condition: service_started
+    networks:
+      - hdv-network
+    restart: unless-stopped
+
+  hdv-movie-service:
+    container_name: hdv-movie-service
+    build: ./services/movie-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-movie-db:3306/hdv_movie?useSSL=false&allowPublicKeyRetrieval=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-movie-db:
+        condition: service_healthy
+      hdv-api-gateway:
+        condition: service_started
+    networks:
+      - hdv-network
+    restart: unless-stopped
+
+  hdv-notification-service:
+    container_name: hdv-notification-service
+    build: ./services/notification-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-notification-db:3306/hdv_notification?useSSL=false&allowPublicKeyRetrieval=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-notification-db:
+        condition: service_healthy
+      hdv-api-gateway:
+        condition: service_started
+    networks:
+      - hdv-network
+    restart: unless-stopped
+
+  hdv-payment-service:
+    container_name: hdv-payment-service
+    build: ./services/payment-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-payment-db:3306/hdv_payment?useSSL=false&allowPublicKeyRetrieval=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-payment-db:
+        condition: service_healthy
+      hdv-api-gateway:
+        condition: service_started
+    networks:
+      - hdv-network
+    restart: unless-stopped
+
+  hdv-seat-availability-service:
+    container_name: hdv-seat-availability-service
+    build: ./services/seat-availability-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-seat-movie-db:3306/hdv_seat_movie?useSSL=false&allowPublicKeyRetrieval=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-seat-movie-db:
+        condition: service_healthy
+      hdv-api-gateway:
+        condition: service_started
+    networks:
+      - hdv-network
+    restart: unless-stopped
+
+  hdv-ticket-booking-service:
+    container_name: hdv-ticket-booking-service
+    build: ./services/ticket-booking-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-ticket-booking-db:3306/hdv_ticket_booking?useSSL=false&allowPublicKeyRetrieval=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-ticket-booking-db:
+        condition: service_healthy
+      hdv-api-gateway:
+        condition: service_started
+    networks:
+      - hdv-network
+    restart: unless-stopped
+
+#  # Angular frontend service
+#  hdv-frontend:
+#    image: nginx:latest
+#    container_name: hdv-frontend
+#    build: ./frontend
+#    ports:
+#      - "4200:80"
+#    environment:
+#      API_GATEWAY_URL: http://hdv-api-gateway:8080
+#    depends_on:
+#      hdv-service-registry:
+#        condition: service_started
+#      hdv-api-gateway:
+#        condition: service_started
+#    networks:
+#      - hdv-network
+#    restart: unless-stopped
+
+# Define networks
+networks:
+  hdv-network:
+    driver: bridge
+
+# Define volumes
+volumes:
+  hdv_customer_data:
+  hdv_movie_data:
+  hdv_notification_data:
+  hdv_payment_data:
+  hdv_seat_movie_data:
+  hdv_ticket_booking_data:

@@ -1,0 +1,9 @@
+logging:
+  level:
+    root: info
+    vn.ptit.moviebooking: info
+  charset:
+    console: UTF-8
+    file: UTF-8
+  # Custom properties to define logs file paths according to different profiles
+  file-path: /mnt/logs

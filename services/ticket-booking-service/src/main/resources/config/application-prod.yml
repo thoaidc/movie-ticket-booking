@@ -12,11 +12,14 @@ logging:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/hdv_ticket_booking?serverTimezone=UTC
-    username: admin_hdv_ticket_booking
-    password: 123456a@
+    url: ${SPRING_DATASOURCE_URL}
+    username: root
+    password: root
 
   jpa:
     properties:
       hibernate:
         show_sql: false
+
+server:
+  port: 8080

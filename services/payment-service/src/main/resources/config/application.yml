@@ -23,5 +23,22 @@ spring:
     init:
       mode: never
 
-server:
-  port: 8103
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    preferIpAddress: true
+    leaseRenewalIntervalInSeconds: 30  # Heartbeat sending frequency
+    instanceId: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
