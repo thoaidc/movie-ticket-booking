@@ -1,23 +1,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <groupId>vn.ptit.moviebooking</groupId>
     <artifactId>discovery-service</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>Eureka server for service discovery</name>
 
     <parent>
-        <groupId>vn.ptit</groupId>
-        <artifactId>moviebooking</artifactId>
-        <version>1.0.0</version>
-        <relativePath>../../pom.xml</relativePath>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.1.5</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
+        <maven.version>3.6.3</maven.version>
+        <java.version>17</java.version>
+        <spring-boot.version>3.1.5</spring-boot.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <profiles.active>dev</profiles.active>
-        <main-start-class>vn.ptit.moviebooking.EurekaServerApplication</main-start-class>
+        <main-start-class>vn.ptit.moviebooking.discovery.EurekaServerApplication</main-start-class>
         <spring-cloud.version>2022.0.4</spring-cloud.version>
+
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler-plugin.version>3.11.0</maven.compiler-plugin.version>
     </properties>
 
     <dependencies>
@@ -81,7 +90,6 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
-                        <compilerArgument>-parameters</compilerArgument>
                         <annotationProcessorPaths>
                             <path>
                                 <groupId>org.springframework.boot</groupId>
@@ -96,19 +104,11 @@
 
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>vn.ptit.moviebooking.GatewayApplication</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
+            <!-- Determine version Java build -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
