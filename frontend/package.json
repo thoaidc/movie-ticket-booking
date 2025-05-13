@@ -4,7 +4,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "npm run moviebooking:build:prod",
+    "build": "npm run cleanup && npm run moviebooking:build:prod",
+    "cleanup": "rimraf target/",
     "start": "ng serve --hmr",
     "test": "ng test --coverage --log-heap-usage -w=2",
     "watch": "ng build --watch --configuration development",

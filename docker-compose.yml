@@ -42,8 +42,8 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
 
   hdv-movie-db:
     image: mysql:8.0.40-oracle
@@ -59,8 +59,8 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
 
   hdv-notification-db:
     image: mysql:8.0.40-oracle
@@ -76,8 +76,8 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
 
   hdv-payment-db:
     image: mysql:8.0.40-oracle
@@ -93,8 +93,8 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
 
   hdv-seat-movie-db:
     image: mysql:8.0.40-oracle
@@ -110,8 +110,8 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
 
   hdv-ticket-booking-db:
     image: mysql:8.0.40-oracle
@@ -127,8 +127,8 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
 
   # Schema generation service for databases
   hdv-db-initializer:
@@ -154,7 +154,7 @@ services:
         condition: service_healthy
     networks:
       - hdv-network
-    restart: "no"  # Run once and then stop
+    restart: no  # Run once and then stop
 
   # Microservices
   hdv-customer-service:
@@ -247,23 +247,20 @@ services:
       - hdv-network
     restart: unless-stopped
 
-#  # Angular frontend service
-#  hdv-frontend:
-#    image: nginx:latest
-#    container_name: hdv-frontend
-#    build: ./frontend
-#    ports:
-#      - "4200:80"
-#    environment:
-#      API_GATEWAY_URL: http://hdv-api-gateway:8080
-#    depends_on:
-#      hdv-service-registry:
-#        condition: service_started
-#      hdv-api-gateway:
-#        condition: service_started
-#    networks:
-#      - hdv-network
-#    restart: unless-stopped
+  # Angular frontend service
+  hdv-frontend:
+    container_name: hdv-frontend
+    build: ./frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      hdv-service-registry:
+        condition: service_started
+      hdv-api-gateway:
+        condition: service_started
+    networks:
+      - hdv-network
+    restart: unless-stopped
 
 # Define networks
 networks:
