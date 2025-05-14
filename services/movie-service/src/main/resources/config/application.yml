@@ -23,6 +23,28 @@ spring:
     init:
       mode: never
 
+  rabbitmq:
+    host: ${RABBIT_MQ_HOST}
+    virtual-host: ${RABBIT_MQ_VIRTUAL_HOST}
+    port: ${RABBIT_MQ_PORT}
+    username: ${RABBIT_MQ_USERNAME}
+    password: ${RABBIT_MQ_PASSWORD}
+    exchange:
+      direct: amq.direct
+    producer:
+      reply-timeout: 60000
+    consumer:
+      max-concurrent-consumer: 2
+      concurrent-consumer: 2
+      prefetch-count: 10
+    queues:
+      MOVIE_VALIDATE_COMMAND:
+        name: queue.movies.command
+        routing-key: routingKey.movies.command
+      MOVIE_VALIDATE_REPLY:
+        name: queue.movies.reply
+        routing-key: routingKey.movies.reply
+
 management:
   endpoints:
     web:
