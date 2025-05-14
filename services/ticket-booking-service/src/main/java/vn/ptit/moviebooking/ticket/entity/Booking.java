@@ -21,7 +21,7 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private String id;
+    private Integer id;
 
     @Column(name = "customer_id", nullable = false)
     private Integer customerId;
@@ -30,7 +30,7 @@ public class Booking {
     private Integer showId;
 
     @Column(name = "total_amount", nullable = false)
-    private Integer totalAmount;
+    private Float totalAmount;
 
     @Column(name = "create_time", nullable = false)
     private Instant createTime;
@@ -38,11 +38,11 @@ public class Booking {
     @Column(name = "status", length = 10, nullable = false)
     private String status;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -62,11 +62,11 @@ public class Booking {
         this.showId = showId;
     }
 
-    public Integer getTotalAmount() {
+    public Float getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(Integer totalAmount) {
+    public void setTotalAmount(Float totalAmount) {
         this.totalAmount = totalAmount;
     }
 

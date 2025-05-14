@@ -1,4 +1,4 @@
-package vn.ptit.moviebooking.payment.service.rabbitmq;
+package vn.ptit.moviebooking.seatavailability.service.rabbitmq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
@@ -8,8 +8,8 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
-import vn.ptit.moviebooking.payment.constants.RabbitMQConstants;
-import vn.ptit.moviebooking.payment.service.PaymentService;
+import vn.ptit.moviebooking.seatavailability.constants.RabbitMQConstants;
+import vn.ptit.moviebooking.seatavailability.service.CheckSeatAvailabilityService;
 
 @Service
 @DependsOn("bindingQueues")
@@ -17,20 +17,20 @@ public class SagaConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(SagaConsumer.class);
     private static final String ENTITY_NAME = "SagaConsumer";
-    private final PaymentService paymentService;
     private final RabbitMQProducer rabbitMQProducer;
+    private final CheckSeatAvailabilityService checkSeatAvailabilityService;
     private final ObjectMapper objectMapper;
 
-    public SagaConsumer(PaymentService paymentService,
-                        RabbitMQProducer rabbitMQProducer,
+    public SagaConsumer(RabbitMQProducer rabbitMQProducer,
+                        CheckSeatAvailabilityService checkSeatAvailabilityService,
                         ObjectMapper objectMapper) {
-        this.paymentService = paymentService;
         this.rabbitMQProducer = rabbitMQProducer;
+        this.checkSeatAvailabilityService = checkSeatAvailabilityService;
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_PROCESS_COMMAND)
-    public void handlePaymentProcessRequest(String message, Channel channel, Message amqpMessage) {
+    @RabbitListener(queues = RabbitMQConstants.Queue.CHECK_SEAT_AVAILABILITY_COMMAND)
+    public void handleCheckSeatAvailabilityRequest(String message, Channel channel, Message amqpMessage) {
         try {
             // Processed success -> send ack
             log.info("Received message from RabbitMQ: {}", message);

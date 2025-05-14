@@ -20,6 +20,49 @@ spring:
       hibernate:
         show_sql: true
 
+  rabbitmq:
+    host: ${RABBIT_MQ_HOST}
+    virtual-host: ${RABBIT_MQ_VIRTUAL_HOST}
+    port: ${RABBIT_MQ_PORT}
+    username: ${RABBIT_MQ_USERNAME}
+    password: ${RABBIT_MQ_PASSWORD}
+    exchange:
+      direct: amq.direct
+    producer:
+      reply-timeout: 60000
+    consumer:
+      max-concurrent-consumer: 2
+      concurrent-consumer: 2
+      prefetch-count: 10
+    queues:
+      MOVIE_VALIDATE_COMMAND:
+        name: queue.movies.command
+        routing-key: routingKey.movies.command
+      MOVIE_VALIDATE_REPLY:
+        name: queue.movies.reply
+        routing-key: routingKey.movies.reply
+      CHECK_SEAT_AVAILABILITY_COMMAND:
+        name: queue.seats.command
+        routing-key: routingKey.seats.command
+      CHECK_SEAT_AVAILABILITY_REPLY:
+        name: queue.seats.reply
+        routing-key: routingKey.seats.reply
+      VERIFY_CUSTOMER_COMMAND:
+        name: queue.customers.command
+        routing-key: routingKey.customers.command
+      VERIFY_CUSTOMER_REPLY:
+        name: queue.customer.reply
+        routing-key: routingKey.customer.reply
+      PAYMENT_PROCESS_COMMAND:
+        name: queue.payments.command
+        routing-key: routingKey.payments.command
+      PAYMENT_PROCESS_REPLY:
+        name: queue.payments.reply
+        routing-key: routingKey.payments.reply
+      NOTIFICATION:
+        name: queue.notifications
+        routing-key: routingKey.notifications
+
 server:
   port: 8105
 

@@ -1,8 +1,8 @@
-package vn.ptit.moviebooking.customer.config.properties;
+package vn.ptit.moviebooking.ticket.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import vn.ptit.moviebooking.customer.constants.PropertiesConstants;
+import vn.ptit.moviebooking.ticket.constants.PropertiesConstants;
 
 import java.util.Map;
 
