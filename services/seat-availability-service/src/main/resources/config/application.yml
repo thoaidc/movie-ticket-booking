@@ -23,6 +23,28 @@ spring:
     init:
       mode: never
 
+  rabbitmq:
+    host: ${RABBIT_MQ_HOST}
+    virtual-host: ${RABBIT_MQ_VIRTUAL_HOST}
+    port: ${RABBIT_MQ_PORT}
+    username: ${RABBIT_MQ_USERNAME}
+    password: ${RABBIT_MQ_PASSWORD}
+    exchange:
+      direct: amq.direct
+    producer:
+      reply-timeout: 60000
+    consumer:
+      max-concurrent-consumer: 2
+      concurrent-consumer: 2
+      prefetch-count: 10
+    queues:
+      CHECK_SEAT_AVAILABILITY_COMMAND:
+        name: queue.seats.command
+        routing-key: routingKey.seats.command
+      CHECK_SEAT_AVAILABILITY_REPLY:
+        name: queue.seats.reply
+        routing-key: routingKey.seats.reply
+
 management:
   endpoints:
     web:
