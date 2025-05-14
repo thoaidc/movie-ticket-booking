@@ -9,10 +9,10 @@ USE `hdv_movie`;
 
 DROP TABLE IF EXISTS `cinema`;
 CREATE TABLE `cinema` (
-    `id` int NOT NULL AUTO_INCREMENT,
-    `name` varchar(45) NOT NULL UNIQUE,
-    `address` varchar(255) NOT NULL,
-    PRIMARY KEY (`id`)
+                          `id` int NOT NULL AUTO_INCREMENT,
+                          `name` varchar(45) NOT NULL UNIQUE,
+                          `address` varchar(255) NOT NULL,
+                          PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 DROP TABLE IF EXISTS `cinema_room`;
@@ -64,7 +64,7 @@ CREATE TABLE `seat` (
     `seat_number` INT NOT NULL,
     `seat_row` INT NOT NULL,
     `code` VARCHAR(10) NOT NULL,
-    `status` ENUM('AVAILABLE', 'BOOKED') NOT NULL DEFAULT 'AVAILABLE',
+    `status` ENUM('AVAILABLE', 'LOCKED', 'BOOKED') NOT NULL DEFAULT 'AVAILABLE',
     CONSTRAINT fk_seat_room FOREIGN KEY (cinema_room_id) REFERENCES cinema_room(id) ON DELETE CASCADE,
     INDEX idx_seat_room (cinema_room_id),
     UNIQUE KEY uk_seat_screen_row_number (cinema_room_id, seat_row, seat_number)

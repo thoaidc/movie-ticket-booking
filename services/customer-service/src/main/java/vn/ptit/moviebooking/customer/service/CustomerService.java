@@ -1,6 +1,10 @@
 package vn.ptit.moviebooking.customer.service;
 
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import vn.ptit.moviebooking.customer.dto.request.SaveCustomerRequest;
 import vn.ptit.moviebooking.customer.exception.BaseBadRequestException;
 import vn.ptit.moviebooking.customer.repository.CustomerRepository;
 import vn.ptit.moviebooking.customer.entity.Customer;
@@ -8,6 +12,7 @@ import vn.ptit.moviebooking.customer.entity.Customer;
 import java.util.Optional;
 
 @Service
+@Validated
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
@@ -25,5 +30,15 @@ public class CustomerService {
         }
 
         return customerOptional.get();
+    }
+
+    @Transactional
+    public Customer saveCustomerInfo(@Valid SaveCustomerRequest request) {
+        Customer customer = new Customer();
+        customer.setFullname(request.getFullname());
+        customer.setEmail(request.getEmail());
+        customer.setPhone(request.getPhone());
+        customerRepository.save(customer);
+        return customer;
     }
 }
