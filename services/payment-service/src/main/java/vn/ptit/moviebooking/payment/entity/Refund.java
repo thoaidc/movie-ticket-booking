@@ -32,9 +32,6 @@ public class Refund {
     @Column(name = "reason", nullable = false)
     private String reason;
 
-    @Column(name = "status", length = 10, nullable = false)
-    private String status;
-
     @Column(name = "refund_time", nullable = false)
     private Instant refundTime;
 
@@ -68,14 +65,6 @@ public class Refund {
 
     public void setReason(String reason) {
         this.reason = reason;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public Instant getRefundTime() {

@@ -26,9 +26,6 @@ public class Payment {
     @Column(name = "booking_id", nullable = false)
     private Integer bookingId;
 
-    @Column(name = "gateway_id", nullable = false)
-    private Integer gatewayId;
-
     @Column(name = "transaction_id", nullable = false)
     private String transactionId;
 
@@ -40,9 +37,6 @@ public class Payment {
 
     @Column(name = "payment_time", nullable = false)
     private Instant paymentTime;
-
-    @Column(name = "currency", length = 3, nullable = false)
-    private String currency;
 
     public String getId() {
         return id;
@@ -58,14 +52,6 @@ public class Payment {
 
     public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
-    }
-
-    public Integer getGatewayId() {
-        return gatewayId;
-    }
-
-    public void setGatewayId(Integer gatewayId) {
-        this.gatewayId = gatewayId;
     }
 
     public String getTransactionId() {
@@ -98,13 +84,5 @@ public class Payment {
 
     public void setPaymentTime(Instant paymentTime) {
         this.paymentTime = paymentTime;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
     }
 }

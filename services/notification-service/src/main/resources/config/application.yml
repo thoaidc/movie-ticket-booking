@@ -38,9 +38,12 @@ spring:
       concurrent-consumer: 2
       prefetch-count: 10
     queues:
-      NOTIFICATION:
-        name: queue.notifications
-        routing-key: routingKey.notifications
+      NOTIFICATION_COMMAND:
+        name: queue.notifications.command
+        routing-key: routingKey.notifications.command
+      NOTIFICATION_REPLY:
+        name: queue.notifications.reply
+        routing-key: routingKey.notifications.reply
 
 management:
   endpoints:

@@ -9,10 +9,10 @@ USE `hdv_movie`;
 
 DROP TABLE IF EXISTS `cinema`;
 CREATE TABLE `cinema` (
-                          `id` int NOT NULL AUTO_INCREMENT,
-                          `name` varchar(45) NOT NULL UNIQUE,
-                          `address` varchar(255) NOT NULL,
-                          PRIMARY KEY (`id`)
+    `id` int NOT NULL AUTO_INCREMENT,
+    `name` varchar(45) NOT NULL UNIQUE,
+    `address` varchar(255) NOT NULL,
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 DROP TABLE IF EXISTS `cinema_room`;

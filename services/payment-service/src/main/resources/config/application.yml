@@ -39,11 +39,17 @@ spring:
       prefetch-count: 10
     queues:
       PAYMENT_PROCESS_COMMAND:
-        name: queue.payments.command
-        routing-key: routingKey.payments.command
+        name: queue.payments.process.command
+        routing-key: routingKey.payments.process.command
+      PAYMENT_REFUND_COMMAND:
+        name: queue.payments.refund.command
+        routing-key: routingKey.payments.refund.command
       PAYMENT_PROCESS_REPLY:
-        name: queue.payments.reply
-        routing-key: routingKey.payments.reply
+        name: queue.payments.process.reply
+        routing-key: routingKey.payments.process.reply
+      PAYMENT_REFUND_REPLY:
+        name: queue.payments.refund.reply
+        routing-key: routingKey.payments.refund.reply
 
 management:
   endpoints:

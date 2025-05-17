@@ -8,15 +8,21 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
+import vn.ptit.moviebooking.notification.constants.NotificationConstants;
 import vn.ptit.moviebooking.notification.constants.RabbitMQConstants;
+import vn.ptit.moviebooking.notification.dto.request.NotificationProcessCommand;
+import vn.ptit.moviebooking.notification.dto.request.NotificationRequest;
+import vn.ptit.moviebooking.notification.dto.response.BaseCommandReplyMessage;
+import vn.ptit.moviebooking.notification.entity.Notification;
 import vn.ptit.moviebooking.notification.service.NotificationService;
+
+import java.util.Objects;
 
 @Service
 @DependsOn("bindingQueues")
 public class SagaConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(SagaConsumer.class);
-    private static final String ENTITY_NAME = "SagaConsumer";
     private final NotificationService notificationService;
     private final RabbitMQProducer rabbitMQProducer;
     private final ObjectMapper objectMapper;
@@ -29,15 +35,28 @@ public class SagaConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = RabbitMQConstants.Queue.NOTIFICATION)
+    @RabbitListener(queues = RabbitMQConstants.Queue.NOTIFICATION_COMMAND)
     public void handleNotificationRequest(String message, Channel channel, Message amqpMessage) {
+        log.info("Received message from RabbitMQ: {}", message);
+        BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
+        String replyMessageStr = null;
+
         try {
-            // Processed success -> send ack
-            log.info("Received message from RabbitMQ: {}", message);
+            NotificationProcessCommand command = objectMapper.convertValue(message, NotificationProcessCommand.class);
+            NotificationRequest notificationRequest = command.getNotificationRequest();
+            Notification notification = notificationService.sendNotification(notificationRequest);
+
+            boolean isSentSuccess = Objects.equals(NotificationConstants.NotificationStatus.SUCCESS, notification.getStatus());
+            replyMessage.setStatus(isSentSuccess);
+            replyMessage.setResult(notification);
+            replyMessage.setSagaId(command.getSagaId());
+            replyMessageStr = objectMapper.writeValueAsString(replyMessage);
+
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {
-            // Notify error back to RabbitMQ with action requeue messages
-            rabbitMQProducer.notifyError(channel, amqpMessage, true);
+            rabbitMQProducer.notifyError(channel, amqpMessage, false);
         }
+
+        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.NOTIFICATION_REPLY, replyMessageStr);
     }
 }
