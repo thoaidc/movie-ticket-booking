@@ -33,7 +33,7 @@ public class TicketBookingService {
         Booking booking = new Booking();
         booking.setShowId(bookingRequest.getShowId());
         booking.setTotalAmount(bookingRequest.getTotalAmount());
-        booking.setStatus(TicketBookingConstants.BOOKING_STATUS.PENDING);
+        booking.setStatus(TicketBookingConstants.BookingStatus.PENDING);
         booking.setCreateTime(Instant.now());
         ticketBookingRepository.save(booking);
 

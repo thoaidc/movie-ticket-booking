@@ -2,7 +2,7 @@ package vn.ptit.moviebooking.ticket.dto.request;
 
 import java.util.List;
 
-public class ValidateMovieCommand extends BaseCommandDTO {
+public class ValidateMovieRequest {
 
     private Integer showId;
     private List<Integer> seatIds;

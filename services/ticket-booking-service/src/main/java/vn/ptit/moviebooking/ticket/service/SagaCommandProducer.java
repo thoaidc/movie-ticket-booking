@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 import vn.ptit.moviebooking.ticket.constants.RabbitMQConstants;
 import vn.ptit.moviebooking.ticket.constants.TicketBookingConstants;
 import vn.ptit.moviebooking.ticket.dto.request.BookingRequest;
-import vn.ptit.moviebooking.ticket.dto.request.ValidateMovieCommand;
+import vn.ptit.moviebooking.ticket.dto.request.ValidateMovieRequest;
+import vn.ptit.moviebooking.ticket.dto.request.ValidateMovieRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.response.BaseResponseDTO;
 import vn.ptit.moviebooking.ticket.entity.Booking;
 import vn.ptit.moviebooking.ticket.exception.BaseBadRequestAlertException;
@@ -40,18 +41,20 @@ public class SagaCommandProducer {
 
     public BaseResponseDTO createBookingSagaOrchestrator(BookingRequest bookingRequest) {
         Booking booking = ticketBookingService.createBooking(bookingRequest); // Create booking with PENDING status
-        ValidateMovieCommand validateMovieCommand = new ValidateMovieCommand();
+        ValidateMovieRequestCommand validateMovieCommand = new ValidateMovieRequestCommand();
+        ValidateMovieRequest validateMovieRequest = new ValidateMovieRequest();
         validateMovieCommand.setSagaId(booking.getId());
-        validateMovieCommand.setShowId(booking.getShowId());
-        validateMovieCommand.setSeatIds(bookingRequest.getSeatIds());
-        validateMovieCommand.setTotalAmount(booking.getTotalAmount());
+        validateMovieRequest.setShowId(booking.getShowId());
+        validateMovieRequest.setSeatIds(bookingRequest.getSeatIds());
+        validateMovieRequest.setTotalAmount(booking.getTotalAmount());
+        validateMovieCommand.setValidateMovieRequest(validateMovieRequest);
 
         try {
             String commandMessage = objectMapper.writeValueAsString(validateMovieCommand);
             rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.MOVIE_VALIDATE_COMMAND, commandMessage);
             return BaseResponseDTO.builder().ok("Create booking request successfully!");
         } catch (JsonProcessingException e) {
-            ticketBookingService.updateBookingStatus(booking.getId(), TicketBookingConstants.BOOKING_STATUS.FAILED);
+            ticketBookingService.updateBookingStatus(booking.getId(), TicketBookingConstants.BookingStatus.FAILED);
             throw new BaseBadRequestAlertException(ENTITY_NAME, "Could not create booking!");
         }
     }

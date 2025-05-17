@@ -39,11 +39,23 @@ spring:
       prefetch-count: 10
     queues:
       CHECK_SEAT_AVAILABILITY_COMMAND:
-        name: queue.seats.command
-        routing-key: routingKey.seats.command
+        name: queue.seats.availability.command
+        routing-key: routingKey.seats.availability.command
       CHECK_SEAT_AVAILABILITY_REPLY:
-        name: queue.seats.reply
-        routing-key: routingKey.seats.reply
+        name: queue.seats.availability.reply
+        routing-key: routingKey.seats.availability.reply
+      CONFIRM_SEAT_COMMAND:
+        name: queue.seats.confirm.command
+        routing-key: routingKey.seats.confirm.command
+      CONFIRM_SEAT_REPLY:
+        name: queue.seats.confirm.reply
+        routing-key: routingKey.seats.confirm.reply
+      RESERVE_SEAT_COMMAND:
+        name: queue.seats.reserve.command
+        routing-key: routingKey.seats.reserve.command
+      RESERVE_SEAT_REPLY:
+        name: queue.seats.reserve.reply
+        routing-key: routingKey.seats.reserve.reply
 
 management:
   endpoints:
