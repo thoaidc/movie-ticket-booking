@@ -16,7 +16,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import vn.ptit.moviebooking.payment.constants.HttpStatusConstants;
 import vn.ptit.moviebooking.payment.dto.response.BaseResponseDTO;
-import vn.ptit.moviebooking.payment.exception.BaseAuthenticationException;
 import vn.ptit.moviebooking.payment.exception.BaseBadRequestAlertException;
 import vn.ptit.moviebooking.payment.exception.BaseBadRequestException;
 import vn.ptit.moviebooking.payment.exception.BaseException;
@@ -40,10 +39,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("Handle method not allow exception. {}", Objects.nonNull(e) ? e.getMessage() : "");
 
         BaseResponseDTO responseDTO = BaseResponseDTO.builder()
-            .code(HttpStatusConstants.METHOD_NOT_ALLOWED)
-            .success(HttpStatusConstants.STATUS.FAILED)
-            .message("Method not allow")
-            .build();
+                .code(HttpStatusConstants.METHOD_NOT_ALLOWED)
+                .success(HttpStatusConstants.STATUS.FAILED)
+                .message("Method not allow")
+                .build();
 
         return new ResponseEntity<>(responseDTO, HttpStatus.METHOD_NOT_ALLOWED);
     }
@@ -60,25 +59,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             message = fieldError.getDefaultMessage(); // If the field with an error includes a custom message key
 
         BaseResponseDTO responseDTO = BaseResponseDTO.builder()
-            .code(HttpStatusConstants.BAD_REQUEST)
-            .success(HttpStatusConstants.STATUS.FAILED)
-            .message(message)
-            .build();
+                .code(HttpStatusConstants.BAD_REQUEST)
+                .success(HttpStatusConstants.STATUS.FAILED)
+                .message(message)
+                .build();
 
         return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler({ BaseAuthenticationException.class })
-    public ResponseEntity<BaseResponseDTO> handleBaseAuthenticationException(BaseAuthenticationException exception) {
-        log.error("[{}] Handle authentication exception: {}", exception.getEntityName(), exception.getMessage());
-
-        BaseResponseDTO responseDTO = BaseResponseDTO.builder()
-            .code(HttpStatusConstants.UNAUTHORIZED)
-            .success(HttpStatusConstants.STATUS.FAILED)
-            .message(exception.getMessage())
-            .build();
-
-        return new ResponseEntity<>(responseDTO, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler({ BaseBadRequestException.class })
@@ -86,10 +72,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[{}] Handle bad request exception: {}", exception.getEntityName(), exception.getMessage());
 
         BaseResponseDTO responseDTO = BaseResponseDTO.builder()
-            .code(HttpStatusConstants.BAD_REQUEST)
-            .success(HttpStatusConstants.STATUS.FAILED)
-            .message(exception.getMessage())
-            .build();
+                .code(HttpStatusConstants.BAD_REQUEST)
+                .success(HttpStatusConstants.STATUS.FAILED)
+                .message(exception.getMessage())
+                .build();
 
         return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
     }
@@ -99,10 +85,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[{}] Handle bad request alert exception: {}", e.getEntityName(), e.getMessage());
 
         BaseResponseDTO responseDTO = BaseResponseDTO.builder()
-            .code(HttpStatusConstants.INTERNAL_SERVER_ERROR)
-            .success(HttpStatusConstants.STATUS.FAILED)
-            .message(e.getMessage())
-            .build();
+                .code(HttpStatusConstants.INTERNAL_SERVER_ERROR)
+                .success(HttpStatusConstants.STATUS.FAILED)
+                .message(e.getMessage())
+                .build();
 
         return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -125,10 +111,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("Handle unexpected exception", exception);
 
         BaseResponseDTO responseDTO = BaseResponseDTO.builder()
-            .code(HttpStatusConstants.INTERNAL_SERVER_ERROR)
-            .success(HttpStatusConstants.STATUS.FAILED)
-            .message("Uncertain error")
-            .build();
+                .code(HttpStatusConstants.INTERNAL_SERVER_ERROR)
+                .success(HttpStatusConstants.STATUS.FAILED)
+                .message("Uncertain error")
+                .build();
 
         return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }

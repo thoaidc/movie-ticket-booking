@@ -1,5 +1,6 @@
 package vn.ptit.moviebooking.payment.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,6 +34,7 @@ public class Refund {
     private String reason;
 
     @Column(name = "refund_time", nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "UTC")
     private Instant refundTime;
 
     public String getId() {

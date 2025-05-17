@@ -1,5 +1,6 @@
 package vn.ptit.moviebooking.movie.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,6 +40,7 @@ public class Movie {
     private String genre;
 
     @Column(name = "release_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone = "UTC")
     private Instant releaseDate;
 
     public String getId() {

@@ -1,5 +1,6 @@
 package vn.ptit.moviebooking.payment.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,6 +37,7 @@ public class Payment {
     private String status;
 
     @Column(name = "payment_time", nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "UTC")
     private Instant paymentTime;
 
     public String getId() {
