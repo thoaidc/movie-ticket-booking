@@ -1,5 +1,6 @@
 package vn.ptit.moviebooking.notification.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,6 +39,7 @@ public class Notification {
     private String status;
 
     @Column(name = "sent_at")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "UTC")
     private Instant sentAt;
 
     public Integer getId() {

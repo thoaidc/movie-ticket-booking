@@ -1,5 +1,6 @@
 package vn.ptit.moviebooking.ticket.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,6 +34,7 @@ public class Booking {
     private Float totalAmount;
 
     @Column(name = "create_time", nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "UTC")
     private Instant createTime;
 
     @Column(name = "status", length = 10, nullable = false)

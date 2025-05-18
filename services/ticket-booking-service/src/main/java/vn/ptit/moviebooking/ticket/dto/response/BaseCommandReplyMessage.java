@@ -6,6 +6,12 @@ public class BaseCommandReplyMessage {
     private boolean status = false;
     private Object result;
 
+    public BaseCommandReplyMessage() {}
+
+    public BaseCommandReplyMessage(int sagaId) {
+        this.sagaId = sagaId;
+    }
+
     public int getSagaId() {
         return sagaId;
     }
@@ -15,6 +21,10 @@ public class BaseCommandReplyMessage {
     }
 
     public boolean getStatus() {
+        return status;
+    }
+
+    public boolean isSuccess() {
         return status;
     }
 
