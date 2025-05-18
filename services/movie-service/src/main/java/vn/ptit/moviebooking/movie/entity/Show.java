@@ -14,7 +14,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.time.Instant;
 
 @Entity
-@Table(name = "show")
+@Table(name = "show_time")
 @DynamicInsert
 @DynamicUpdate
 public class Show {
@@ -22,7 +22,7 @@ public class Show {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private String id;
+    private Integer id;
 
     @Column(name = "movie_id", nullable = false)
     private Integer movieId;
@@ -44,11 +44,11 @@ public class Show {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm", timezone = "UTC")
     private Instant endTime;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -23,7 +23,7 @@ public class RabbitMQProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendMessage(String routingKey, String message) {
+    public void sendMessage(String routingKey, Object message) {
         log.debug("Send message: {} - routing by key: {}", message, routingKey);
         rabbitTemplate.convertAndSend(RabbitMQConstants.Exchange.DIRECT_EXCHANGE, routingKey, message);
     }

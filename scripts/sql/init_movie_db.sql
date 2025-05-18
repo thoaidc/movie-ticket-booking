@@ -41,8 +41,8 @@ CREATE TABLE `movie` (
     INDEX idx_movie_release (release_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-DROP TABLE IF EXISTS `show`;
-CREATE TABLE `show` (
+DROP TABLE IF EXISTS `show_time`;
+CREATE TABLE `show_time` (
     `id` int NOT NULL AUTO_INCREMENT,
     `movie_id` int NOT NULL,
     `cinema_room_id` int NOT NULL,
@@ -108,7 +108,7 @@ INSERT INTO `movie` (`name`, `description`, `duration`, `director`, `genre`, `re
 ('Spirited Away', 'During her family\'s move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits, and where humans are changed into beasts.', 125, 'Hayao Miyazaki', 'Animation, Adventure, Family', '2025-05-14 00:00:00');
 
 -- Create show times from May 18, 2025 to May 30, 2025
-INSERT INTO `show` (`movie_id`, `cinema_room_id`, `ticket_price`, `status`, `start_time`, `end_time`) VALUES
+INSERT INTO show_time (`movie_id`, `cinema_room_id`, `ticket_price`, `status`, `start_time`, `end_time`) VALUES
 -- The Avengers: Endgame shows
 (1, 1, 120000.00, 'ACTIVE', '2025-05-18 09:00:00', '2025-05-18 12:01:00'),
 (1, 3, 180000.00, 'ACTIVE', '2025-05-19 14:30:00', '2025-05-19 17:31:00'),

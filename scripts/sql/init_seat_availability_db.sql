@@ -10,11 +10,11 @@ USE `hdv_seat_availability`;
 DROP TABLE IF EXISTS `seat_show`;
 CREATE TABLE `seat_show` (
     `id` int NOT NULL AUTO_INCREMENT,
-    `room_id` int NOT NULL,
+    `seat_id` int NOT NULL,
     `show_id` int NOT NULL,
     `status` ENUM('AVAILABLE', 'RESERVED', 'BOOKED') NOT NULL DEFAULT 'AVAILABLE',
     PRIMARY KEY (`id`),
-    INDEX idx_seat_room (room_id),
+    INDEX idx_seat_room (seat_id),
     INDEX idx_seat_show (show_id),
     INDEX idx_seat_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

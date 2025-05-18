@@ -5,7 +5,7 @@ public interface RabbitMQConstants {
     interface Queue {
         String CHECK_SEATS_AVAILABILITY_COMMAND = "queue.seats.availability.command";
         String CONFIRM_SEATS_COMMAND = "queue.seats.confirm.command";
-        String RESERVE_SEATS_COMMAND = "queue.seats.released.command";
+        String RELEASED_SEATS_COMMAND = "queue.seats.released.command";
     }
 
     interface RoutingKey {

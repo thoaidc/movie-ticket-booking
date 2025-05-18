@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -18,10 +19,10 @@ public class SeatShow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private String id;
+    private Integer id;
 
-    @Column(name = "room_id", nullable = false)
-    private Integer roomId;
+    @Column(name = "seat_id", nullable = false)
+    private Integer seatId;
 
     @Column(name = "show_id", nullable = false)
     private Integer showId;
@@ -29,20 +30,20 @@ public class SeatShow {
     @Column(name = "status", length = 15, nullable = false)
     private String status;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Integer getRoomId() {
-        return roomId;
+    public Integer getSeatId() {
+        return seatId;
     }
 
-    public void setRoomId(Integer roomId) {
-        this.roomId = roomId;
+    public void setSeatId(Integer seatId) {
+        this.seatId = seatId;
     }
 
     public Integer getShowId() {

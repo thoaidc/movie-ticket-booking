@@ -19,7 +19,7 @@ public class Cinema {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private String id;
+    private Integer id;
 
     @Column(name = "name", length = 100, nullable = false, unique = true)
     private String name;
@@ -27,11 +27,11 @@ public class Cinema {
     @Column(name = "address", nullable = false)
     private String address;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -19,7 +19,7 @@ public class Seat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private String id;
+    private Integer id;
 
     @Column(name = "cinema_room_id", nullable = false)
     private Integer cinemaRoomId;
@@ -36,11 +36,11 @@ public class Seat {
     @Column(name = "status", length = 10, nullable = false)
     private String status;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

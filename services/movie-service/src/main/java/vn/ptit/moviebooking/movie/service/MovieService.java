@@ -5,12 +5,16 @@ import org.springframework.stereotype.Service;
 
 import vn.ptit.moviebooking.movie.dto.request.BaseRequestDTO;
 import vn.ptit.moviebooking.movie.dto.response.BaseResponseDTO;
+import vn.ptit.moviebooking.movie.dto.response.ShowSeatResponse;
 import vn.ptit.moviebooking.movie.entity.Movie;
+import vn.ptit.moviebooking.movie.entity.Show;
 import vn.ptit.moviebooking.movie.repository.CinemaRepository;
 import vn.ptit.moviebooking.movie.repository.CinemaRoomRepository;
 import vn.ptit.moviebooking.movie.repository.MovieRepository;
 import vn.ptit.moviebooking.movie.repository.SeatRepository;
 import vn.ptit.moviebooking.movie.repository.ShowRepository;
+
+import java.util.List;
 
 @Service
 public class MovieService {
@@ -60,7 +64,18 @@ public class MovieService {
         return BaseResponseDTO.builder().ok(showRepository.findAllByMovieId(movieId));
     }
 
-    public BaseResponseDTO getAllSeatsByRoomId(Integer roomId) {
-        return BaseResponseDTO.builder().ok(seatRepository.findAllByCinemaRoomId(roomId));
+    public BaseResponseDTO getAllSeatsByShowId(Integer showId) {
+        return BaseResponseDTO.builder().ok(seatRepository.findAllByShowId(showId));
+    }
+
+    public BaseResponseDTO getAllSeatsGroupedByShow() {
+        List<Show> shows = showRepository.findAll();
+
+        List<ShowSeatResponse> result = shows.stream().map(show -> {
+            List<Integer> seats = seatRepository.findAllIdByCinemaRoomId(show.getCinemaRoomId());
+            return new ShowSeatResponse(show.getId(), seats);
+        }).toList();
+
+        return BaseResponseDTO.builder().ok(result);
     }
 }
