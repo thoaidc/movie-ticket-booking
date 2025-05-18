@@ -96,14 +96,14 @@ services:
       timeout: 10s
       retries: 10
 
-  hdv-seat-movie-db:
+  hdv-seat-availability-db:
     image: mysql:8.0.40-oracle
-    container_name: hdv-seat-movie-db
+    container_name: hdv-seat-availability-db
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hdv_seat_movie
+      MYSQL_DATABASE: hdv_seat_availability
     volumes:
-      - hdv_seat_movie_data:/var/lib/mysql
+      - hdv_seat_availability_data:/var/lib/mysql
     networks:
       - hdv-network
     restart: unless-stopped
@@ -148,7 +148,7 @@ services:
         condition: service_healthy
       hdv-payment-db:
         condition: service_healthy
-      hdv-seat-movie-db:
+      hdv-seat-availability-db:
         condition: service_healthy
       hdv-ticket-booking-db:
         condition: service_healthy
@@ -160,6 +160,8 @@ services:
   hdv-customer-service:
     container_name: hdv-customer-service
     build: ./services/customer-service
+    env_file:
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://hdv-customer-db:3306/hdv_customer?useSSL=false&allowPublicKeyRetrieval=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
@@ -175,6 +177,8 @@ services:
   hdv-movie-service:
     container_name: hdv-movie-service
     build: ./services/movie-service
+    env_file:
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://hdv-movie-db:3306/hdv_movie?useSSL=false&allowPublicKeyRetrieval=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
@@ -190,6 +194,8 @@ services:
   hdv-notification-service:
     container_name: hdv-notification-service
     build: ./services/notification-service
+    env_file:
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://hdv-notification-db:3306/hdv_notification?useSSL=false&allowPublicKeyRetrieval=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
@@ -205,6 +211,8 @@ services:
   hdv-payment-service:
     container_name: hdv-payment-service
     build: ./services/payment-service
+    env_file:
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://hdv-payment-db:3306/hdv_payment?useSSL=false&allowPublicKeyRetrieval=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
@@ -220,11 +228,13 @@ services:
   hdv-seat-availability-service:
     container_name: hdv-seat-availability-service
     build: ./services/seat-availability-service
+    env_file:
+      - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-seat-movie-db:3306/hdv_seat_movie?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-seat-availability-db:3306/hdv_seat_availability?useSSL=false&allowPublicKeyRetrieval=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
     depends_on:
-      hdv-seat-movie-db:
+      hdv-seat-availability-db:
         condition: service_healthy
       hdv-api-gateway:
         condition: service_started
@@ -235,6 +245,8 @@ services:
   hdv-ticket-booking-service:
     container_name: hdv-ticket-booking-service
     build: ./services/ticket-booking-service
+    env_file:
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://hdv-ticket-booking-db:3306/hdv_ticket_booking?useSSL=false&allowPublicKeyRetrieval=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
@@ -273,5 +285,5 @@ volumes:
   hdv_movie_data:
   hdv_notification_data:
   hdv_payment_data:
-  hdv_seat_movie_data:
+  hdv_seat_availability_data:
   hdv_ticket_booking_data:

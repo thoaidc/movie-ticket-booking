@@ -16,7 +16,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import vn.ptit.moviebooking.ticket.constants.HttpStatusConstants;
 import vn.ptit.moviebooking.ticket.dto.response.BaseResponseDTO;
-import vn.ptit.moviebooking.ticket.exception.BaseAuthenticationException;
 import vn.ptit.moviebooking.ticket.exception.BaseBadRequestAlertException;
 import vn.ptit.moviebooking.ticket.exception.BaseBadRequestException;
 import vn.ptit.moviebooking.ticket.exception.BaseException;
@@ -66,19 +65,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             .build();
 
         return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler({ BaseAuthenticationException.class })
-    public ResponseEntity<BaseResponseDTO> handleBaseAuthenticationException(BaseAuthenticationException exception) {
-        log.error("[{}] Handle authentication exception: {}", exception.getEntityName(), exception.getMessage());
-
-        BaseResponseDTO responseDTO = BaseResponseDTO.builder()
-            .code(HttpStatusConstants.UNAUTHORIZED)
-            .success(HttpStatusConstants.STATUS.FAILED)
-            .message(exception.getMessage())
-            .build();
-
-        return new ResponseEntity<>(responseDTO, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler({ BaseBadRequestException.class })

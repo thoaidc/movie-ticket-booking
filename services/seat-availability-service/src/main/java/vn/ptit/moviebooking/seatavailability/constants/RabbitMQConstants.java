@@ -3,15 +3,15 @@ package vn.ptit.moviebooking.seatavailability.constants;
 public interface RabbitMQConstants {
 
     interface Queue {
-        String CHECK_SEAT_AVAILABILITY_COMMAND = "queue.seats.availability.command";
-        String CONFIRM_SEAT_COMMAND = "queue.seats.confirm.command";
-        String RESERVE_SEAT_COMMAND = "queue.seats.reserve.command";
+        String CHECK_SEATS_AVAILABILITY_COMMAND = "queue.seats.availability.command";
+        String CONFIRM_SEATS_COMMAND = "queue.seats.confirm.command";
+        String RELEASED_SEATS_COMMAND = "queue.seats.released.command";
     }
 
     interface RoutingKey {
-        String CHECK_SEAT_AVAILABILITY_REPLY = "queue.seats.availability.reply";
-        String CONFIRM_SEAT_REPLY = "queue.seats.confirm.reply";
-        String RESERVE_SEAT_REPLY = "queue.seats.reserve.reply";
+        String CHECK_SEATS_AVAILABILITY_REPLY = "queue.seats.availability.reply";
+        String CONFIRM_SEATS_REPLY = "queue.seats.confirm.reply";
+        String RELEASED_SEATS_REPLY = "queue.seats.released.reply";
     }
 
     interface Exchange {

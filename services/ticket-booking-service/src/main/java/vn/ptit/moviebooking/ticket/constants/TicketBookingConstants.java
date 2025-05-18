@@ -7,7 +7,6 @@ public interface TicketBookingConstants {
         String SEAT_RESERVED = "SEAT_RESERVED";
         String PAID = "PAID";
         String CANCELLED = "CANCELLED";
-        String REFUNDED = "REFUNDED";
         String FAILED = "FAILED";
         String COMPLETED = "COMPLETED";
     }

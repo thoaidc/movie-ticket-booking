@@ -19,7 +19,7 @@ public class BookingSeat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private String id;
+    private Integer id;
 
     @Column(name = "booking_id", nullable = false)
     private Integer bookingId;
@@ -27,11 +27,11 @@ public class BookingSeat {
     @Column(name = "seat_id", nullable = false)
     private Integer seatId;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -1,12 +1,18 @@
-package vn.ptit.moviebooking.ticket.dto.request;
+package vn.ptit.moviebooking.movie.dto.response;
 
 import java.util.List;
 
-public class ValidateMovieCommand extends BaseCommandDTO {
+public class ShowSeatResponse {
 
     private Integer showId;
     private List<Integer> seatIds;
-    private Float totalAmount;
+
+    public ShowSeatResponse() {}
+
+    public ShowSeatResponse(Integer showId, List<Integer> seatIds) {
+        this.showId = showId;
+        this.seatIds = seatIds;
+    }
 
     public Integer getShowId() {
         return showId;
@@ -22,13 +28,5 @@ public class ValidateMovieCommand extends BaseCommandDTO {
 
     public void setSeatIds(List<Integer> seatIds) {
         this.seatIds = seatIds;
-    }
-
-    public Float getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(Float totalAmount) {
-        this.totalAmount = totalAmount;
     }
 }

@@ -1,4 +1,4 @@
-package vn.ptit.moviebooking.seatavailability.dto.request;
+package vn.ptit.moviebooking.movie.dto.request;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
-import vn.ptit.moviebooking.seatavailability.constants.DatetimeConstants;
+import vn.ptit.moviebooking.movie.constants.DatetimeConstants;
 
 import java.io.Serial;
 import java.io.Serializable;

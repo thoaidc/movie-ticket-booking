@@ -14,7 +14,7 @@ CREATE TABLE `booking` (
     `show_id` int NOT NULL,
     `total_amount` bigint NOT NULL,
     `create_time` timestamp NOT NULL,
-    `status` varchar(45) NOT NULL,
+    `status` ENUM('PENDING', 'SEAT_RESERVED', 'PAID', 'COMPLETED', 'FAILED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
     PRIMARY KEY (`id`),
     INDEX idx_booking_customer (customer_id),
     INDEX idx_booking_show (show_id),
