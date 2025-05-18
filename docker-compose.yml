@@ -96,14 +96,14 @@ services:
       timeout: 10s
       retries: 10
 
-  hdv-seat-movie-db:
+  hdv-seat-availability-db:
     image: mysql:8.0.40-oracle
-    container_name: hdv-seat-movie-db
+    container_name: hdv-seat-availability-db
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hdv_seat_movie
+      MYSQL_DATABASE: hdv_seat_availability
     volumes:
-      - hdv_seat_movie_data:/var/lib/mysql
+      - hdv_seat_availability_data:/var/lib/mysql
     networks:
       - hdv-network
     restart: unless-stopped
@@ -148,7 +148,7 @@ services:
         condition: service_healthy
       hdv-payment-db:
         condition: service_healthy
-      hdv-seat-movie-db:
+      hdv-seat-availability-db:
         condition: service_healthy
       hdv-ticket-booking-db:
         condition: service_healthy
@@ -231,10 +231,10 @@ services:
     env_file:
       - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-seat-movie-db:3306/hdv_seat_movie?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-seat-availability-db:3306/hdv_seat_availability?useSSL=false&allowPublicKeyRetrieval=true
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
     depends_on:
-      hdv-seat-movie-db:
+      hdv-seat-availability-db:
         condition: service_healthy
       hdv-api-gateway:
         condition: service_started
@@ -285,5 +285,5 @@ volumes:
   hdv_movie_data:
   hdv_notification_data:
   hdv_payment_data:
-  hdv_seat_movie_data:
+  hdv_seat_availability_data:
   hdv_ticket_booking_data:

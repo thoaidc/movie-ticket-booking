@@ -10,12 +10,11 @@ import vn.ptit.moviebooking.ticket.dto.request.CheckSeatAvailabilityRequestComma
 import vn.ptit.moviebooking.ticket.dto.request.ConfirmSeatsRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.PaymentRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.RefundRequestCommand;
-import vn.ptit.moviebooking.ticket.dto.request.ReserveSeatsRequestCommand;
+import vn.ptit.moviebooking.ticket.dto.request.ReleasedSeatsRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.ValidateMovieRequest;
 import vn.ptit.moviebooking.ticket.dto.request.ValidateMovieRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.VerifyCustomerRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.response.BaseCommandReplyMessage;
-import vn.ptit.moviebooking.ticket.dto.response.BaseResponseDTO;
 import vn.ptit.moviebooking.ticket.entity.Booking;
 import vn.ptit.moviebooking.ticket.entity.BookingSeat;
 import vn.ptit.moviebooking.ticket.exception.BaseBadRequestException;
@@ -59,7 +58,6 @@ public class TicketBookingService {
         }
 
         bookingSeatRepository.saveAll(bookingSeats);
-
         return booking;
     }
 
@@ -94,8 +92,8 @@ public class TicketBookingService {
         return command;
     }
 
-    public ReserveSeatsRequestCommand createReserveBookingSeatsCommand(BaseCommandReplyMessage request) {
-        ReserveSeatsRequestCommand command = new ReserveSeatsRequestCommand();
+    public ReleasedSeatsRequestCommand createReleasedBookingSeatsCommand(BaseCommandReplyMessage request) {
+        ReleasedSeatsRequestCommand command = new ReleasedSeatsRequestCommand();
 
         return command;
     }

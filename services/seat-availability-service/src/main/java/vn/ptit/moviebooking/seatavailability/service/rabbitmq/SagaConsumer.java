@@ -29,7 +29,7 @@ public class SagaConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = RabbitMQConstants.Queue.CHECK_SEAT_AVAILABILITY_COMMAND)
+    @RabbitListener(queues = RabbitMQConstants.Queue.CHECK_SEATS_AVAILABILITY_COMMAND)
     public void handleCheckSeatAvailabilityRequest(String message, Channel channel, Message amqpMessage) {
         try {
             // Processed success -> send ack
