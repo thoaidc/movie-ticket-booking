@@ -42,11 +42,10 @@ public class SagaConsumer {
     @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_PROCESS_COMMAND)
     public void handlePaymentProcessRequest(String message, Channel channel, Message amqpMessage) {
         log.info("Received message from RabbitMQ: {}", message);
-        BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage(false, null);
-        String replyMessageStr = null;
+        BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            PaymentProcessCommand command = objectMapper.convertValue(message, PaymentProcessCommand.class);
+            PaymentProcessCommand command = objectMapper.readValue(message, PaymentProcessCommand.class);
             PaymentRequest paymentRequest = command.getPaymentRequest();
 
             Payment payment = paymentService.createPayment(paymentRequest);
@@ -55,36 +54,35 @@ public class SagaConsumer {
             boolean isPaymentSuccess = Objects.equals(PaymentConstants.PaymentStatus.COMPLETED, payment.getStatus());
             replyMessage.setStatus(isPaymentSuccess);
             replyMessage.setResult(payment);
-            replyMessageStr = objectMapper.writeValueAsString(replyMessage);
+            replyMessage.setSagaId(command.getSagaId());
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {
             rabbitMQProducer.notifyError(channel, amqpMessage, false);
         }
 
-        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.PAYMENT_PROCESS_REPLY, replyMessageStr);
+        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.PAYMENT_PROCESS_REPLY, replyMessage);
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_REFUND_COMMAND)
     public void handleRefundRequest(String message, Channel channel, Message amqpMessage) {
         log.info("Received message from RabbitMQ: {}", message);
-        BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage(false, null);
-        String replyMessageStr = null;
+        BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            RefundProcessCommand command = objectMapper.convertValue(message, RefundProcessCommand.class);
+            RefundProcessCommand command = objectMapper.readValue(message, RefundProcessCommand.class);
             RefundRequest refundRequest = command.getRefundRequest();
             Refund refund = paymentService.refund(refundRequest);
 
             replyMessage.setStatus(true);
             replyMessage.setResult(refund);
-            replyMessageStr = objectMapper.writeValueAsString(replyMessage);
+            replyMessage.setSagaId(command.getSagaId());
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {
             rabbitMQProducer.notifyError(channel, amqpMessage, false);
         }
 
-        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.PAYMENT_REFUND_REPLY, replyMessageStr);
+        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.PAYMENT_REFUND_REPLY, replyMessage);
     }
 }

@@ -38,17 +38,15 @@ public class SagaConsumer {
     public void handleVerifyCustomerRequest(String message, Channel channel, Message amqpMessage) {
         log.info("Received message from RabbitMQ: {}", message);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
-        String replyMessageStr = null;
 
         try {
-            VerifyCustomerCommand command = objectMapper.convertValue(amqpMessage, VerifyCustomerCommand.class);
+            VerifyCustomerCommand command = objectMapper.readValue(message, VerifyCustomerCommand.class);
             SaveCustomerRequest saveCustomerRequest = command.getSaveCustomerRequest();
             Customer customer = customerService.saveCustomerInfo(saveCustomerRequest);
 
             replyMessage.setSagaId(command.getSagaId());
             replyMessage.setStatus(Objects.nonNull(customer) && customer.getId() > 0);
             replyMessage.setResult(customer);
-            replyMessageStr = objectMapper.writeValueAsString(replyMessage);
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {
@@ -57,6 +55,6 @@ public class SagaConsumer {
         }
 
         // Reply result to saga orchestrator in Ticket booking service
-        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.VERIFY_CUSTOMER_REPLY, replyMessageStr);
+        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.VERIFY_CUSTOMER_REPLY, replyMessage);
     }
 }

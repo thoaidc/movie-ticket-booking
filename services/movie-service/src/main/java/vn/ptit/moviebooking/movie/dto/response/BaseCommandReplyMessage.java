@@ -2,12 +2,16 @@ package vn.ptit.moviebooking.movie.dto.response;
 
 public class BaseCommandReplyMessage {
 
-    private boolean status;
-    private Object result;
+    private int sagaId;
+    private boolean status = false;
+    private Object result = null;
 
-    public BaseCommandReplyMessage(boolean status, Object result) {
-        this.status = status;
-        this.result = result;
+    public int getSagaId() {
+        return sagaId;
+    }
+
+    public void setSagaId(int sagaId) {
+        this.sagaId = sagaId;
     }
 
     public boolean getStatus() {

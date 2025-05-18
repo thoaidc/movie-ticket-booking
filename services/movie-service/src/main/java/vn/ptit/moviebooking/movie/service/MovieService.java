@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import vn.ptit.moviebooking.movie.dto.request.BaseRequestDTO;
+import vn.ptit.moviebooking.movie.dto.request.ValidateMovieRequest;
 import vn.ptit.moviebooking.movie.dto.response.BaseResponseDTO;
 import vn.ptit.moviebooking.movie.dto.response.ShowSeatResponse;
 import vn.ptit.moviebooking.movie.entity.Movie;
@@ -35,6 +36,10 @@ public class MovieService {
         this.cinemaRoomRepository = cinemaRoomRepository;
         this.showRepository = showRepository;
         this.seatRepository = seatRepository;
+    }
+
+    public BaseResponseDTO validateMovieInfo(ValidateMovieRequest request) {
+        return BaseResponseDTO.builder().ok();
     }
 
     public BaseResponseDTO getAllMovieWithPaging(BaseRequestDTO request) {

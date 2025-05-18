@@ -39,10 +39,9 @@ public class SagaConsumer {
     public void handleNotificationRequest(String message, Channel channel, Message amqpMessage) {
         log.info("Received message from RabbitMQ: {}", message);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
-        String replyMessageStr = null;
 
         try {
-            NotificationProcessCommand command = objectMapper.convertValue(message, NotificationProcessCommand.class);
+            NotificationProcessCommand command = objectMapper.readValue(message, NotificationProcessCommand.class);
             NotificationRequest notificationRequest = command.getNotificationRequest();
             Notification notification = notificationService.sendNotification(notificationRequest);
 
@@ -50,13 +49,12 @@ public class SagaConsumer {
             replyMessage.setStatus(isSentSuccess);
             replyMessage.setResult(notification);
             replyMessage.setSagaId(command.getSagaId());
-            replyMessageStr = objectMapper.writeValueAsString(replyMessage);
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {
             rabbitMQProducer.notifyError(channel, amqpMessage, false);
         }
 
-        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.NOTIFICATION_REPLY, replyMessageStr);
+        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.NOTIFICATION_REPLY, replyMessage);
     }
 }
