@@ -1,21 +1,19 @@
 package vn.ptit.moviebooking.customer.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import vn.ptit.moviebooking.customer.constants.RegexConstants;
+public class VerifyCustomerRequest {
 
-public class SaveCustomerRequest {
-
-    @NotBlank(message = "Fullname cannot be blank")
+    private Integer bookingId;
     private String fullname;
-
-    @NotBlank(message = "Email cannot be blank")
-    @Pattern(regexp = RegexConstants.EMAIL_PATTERN, message = "Email is invalid format")
     private String email;
-
-    @NotBlank(message = "Phone number cannot be blank")
-    @Pattern(regexp = RegexConstants.PHONE_PATTERN, message = "Phone number is invalid format")
     private String phone;
+
+    public Integer getBookingId() {
+        return bookingId;
+    }
+
+    public void setBookingId(Integer bookingId) {
+        this.bookingId = bookingId;
+    }
 
     public String getFullname() {
         return fullname;

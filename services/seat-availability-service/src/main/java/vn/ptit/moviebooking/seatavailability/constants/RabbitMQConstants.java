@@ -9,9 +9,9 @@ public interface RabbitMQConstants {
     }
 
     interface RoutingKey {
-        String CHECK_SEATS_AVAILABILITY_REPLY = "queue.seats.availability.reply";
-        String CONFIRM_SEATS_REPLY = "queue.seats.confirm.reply";
-        String RELEASED_SEATS_REPLY = "queue.seats.released.reply";
+        String CHECK_SEATS_AVAILABILITY_REPLY = "routingKey.seats.availability.reply";
+        String CONFIRM_SEATS_REPLY = "routingKey.seats.confirm.reply";
+        String RELEASED_SEATS_REPLY = "routingKey.seats.released.reply";
     }
 
     interface Exchange {

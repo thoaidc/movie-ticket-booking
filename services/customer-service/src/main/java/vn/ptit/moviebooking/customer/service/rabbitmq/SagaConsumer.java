@@ -7,9 +7,10 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
+
 import vn.ptit.moviebooking.customer.constants.RabbitMQConstants;
-import vn.ptit.moviebooking.customer.dto.request.SaveCustomerRequest;
-import vn.ptit.moviebooking.customer.dto.request.VerifyCustomerCommand;
+import vn.ptit.moviebooking.customer.dto.request.VerifyCustomerRequest;
+import vn.ptit.moviebooking.customer.dto.request.VerifyCustomerRequestCommand;
 import vn.ptit.moviebooking.customer.dto.response.BaseCommandReplyMessage;
 import vn.ptit.moviebooking.customer.entity.Customer;
 import vn.ptit.moviebooking.customer.service.CustomerService;
@@ -31,12 +32,12 @@ public class SagaConsumer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.VERIFY_CUSTOMER_COMMAND)
-    public void handleVerifyCustomerRequest(VerifyCustomerCommand command, Channel channel, Message amqpMessage) {
+    public void handleVerifyCustomerRequest(VerifyCustomerRequestCommand command, Channel channel, Message amqpMessage) {
         log.info("Received message from RabbitMQ: {}", command);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            SaveCustomerRequest saveCustomerRequest = command.getSaveCustomerRequest();
+            VerifyCustomerRequest saveCustomerRequest = command.getVerifyCustomerRequest();
             Customer customer = customerService.saveCustomerInfo(saveCustomerRequest);
 
             replyMessage.setSagaId(command.getSagaId());

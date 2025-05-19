@@ -55,7 +55,7 @@ public class CheckSeatAvailabilityService {
     @Transactional
     public BaseResponseDTO checkSeatsAvailability(SeatsCommand command) {
         List<SeatShow> seatShows = seatShowRepository
-                .findAllByIdInAndStatus(command.getSeatIds(), SeatsConstants.Status.AVAILABLE);
+                .findAllByIdInAndStatusForUpdate(command.getSeatIds(), SeatsConstants.Status.AVAILABLE);
 
         if (seatShows.size() == command.getSeatIds().size()) {
             seatShows.forEach(seat -> seat.setStatus(SeatsConstants.Status.RESERVED));
