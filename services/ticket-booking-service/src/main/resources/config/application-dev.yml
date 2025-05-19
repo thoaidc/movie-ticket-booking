@@ -70,9 +70,12 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: true
     register-with-eureka: true
     fetch-registry: true
   instance:
     preferIpAddress: true
-    leaseRenewalIntervalInSeconds: 30  # Heartbeat sending frequency
+    lease-renewal-interval-in-seconds: 5  # Heartbeat frequency
+    lease-expiration-duration-in-seconds: 60  # Expiration time if no heartbeat received
     instanceId: ${spring.application.name}:${server.port}

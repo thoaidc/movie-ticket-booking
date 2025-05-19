@@ -1,5 +1,5 @@
 # Stage 1: Build Angular app
-FROM node:18 AS build
+FROM node:18.20.5 AS build
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve Angular app with Nginx
-FROM nginx:alpine
+FROM nginx:stable-alpine
 
 # Copy built app from previous stage
 COPY --from=build /app/target/* /usr/share/nginx/html/

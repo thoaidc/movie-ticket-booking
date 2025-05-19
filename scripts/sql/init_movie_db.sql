@@ -21,7 +21,7 @@ CREATE TABLE `cinema_room` (
     `cinema_id` INT NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `capacity` INT NOT NULL,
-    `screen_type` ENUM('2D', '3D', 'IMAX', '4DX') NOT NULL DEFAULT '2D',
+    `screen_type` VARCHAR(10) NOT NULL DEFAULT '2D',
     CONSTRAINT fk_room_cinema FOREIGN KEY (cinema_id) REFERENCES cinema(id) ON DELETE CASCADE,
     INDEX idx_room_cinema (cinema_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -47,7 +47,7 @@ CREATE TABLE `show_time` (
     `movie_id` int NOT NULL,
     `cinema_room_id` int NOT NULL,
     `ticket_price` DECIMAL(10,2) NOT NULL,
-    `status` ENUM('ACTIVE', 'CANCELLED', 'COMPLETED') NOT NULL DEFAULT 'ACTIVE',
+    `status` VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     `start_time` timestamp not null,
     `end_time` timestamp not null,
     PRIMARY KEY (`id`),
@@ -65,7 +65,7 @@ CREATE TABLE `seat` (
     `seat_number` INT NOT NULL,
     `seat_row` INT NOT NULL,
     `code` VARCHAR(10) NOT NULL,
-    `status` ENUM('ACTIVE', 'MAINTENANCE') NOT NULL DEFAULT 'ACTIVE',
+    `status` VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     CONSTRAINT fk_seat_room FOREIGN KEY (cinema_room_id) REFERENCES cinema_room(id) ON DELETE CASCADE,
     INDEX idx_seat_room (cinema_room_id),
     UNIQUE KEY uk_seat_screen_row_number (cinema_room_id, seat_row, seat_number)

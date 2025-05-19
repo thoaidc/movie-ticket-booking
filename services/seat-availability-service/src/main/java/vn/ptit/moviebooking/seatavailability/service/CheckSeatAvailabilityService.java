@@ -1,6 +1,7 @@
 package vn.ptit.moviebooking.seatavailability.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.ptit.moviebooking.seatavailability.constants.HttpStatusConstants;
@@ -12,6 +13,7 @@ import vn.ptit.moviebooking.seatavailability.entity.SeatShow;
 import vn.ptit.moviebooking.seatavailability.repository.SeatShowRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CheckSeatAvailabilityService {
@@ -29,8 +31,13 @@ public class CheckSeatAvailabilityService {
     }
 
     @Transactional
-    public BaseResponseDTO initSeatsOfShow() {
+    public ResponseEntity<?> initSeatsOfShow() {
         BaseResponseDTO response = movieServiceClient.getAllSeatsByShows();
+
+        if (!response.getStatus() || Objects.isNull(response.getResult())) {
+            return ResponseEntity.internalServerError().build();
+        }
+
         List<?> rawList = (List<?>) response.getResult();
         List<ShowSeatResponse> seats = rawList.stream()
                 .map(obj -> objectMapper.convertValue(obj, ShowSeatResponse.class))
@@ -49,7 +56,7 @@ public class CheckSeatAvailabilityService {
 
         seatShowRepository.deleteAll();
         seatShowRepository.saveAll(seatShows);
-        return BaseResponseDTO.builder().ok();
+        return ResponseEntity.ok().build();
     }
 
     @Transactional

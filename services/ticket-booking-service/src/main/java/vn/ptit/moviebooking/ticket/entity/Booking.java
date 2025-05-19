@@ -37,7 +37,7 @@ public class Booking {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "UTC")
     private Instant createTime;
 
-    @Column(name = "status", length = 20, nullable = false)
+    @Column(name = "status", nullable = false)
     private String status;
 
     public Integer getId() {
