@@ -53,12 +53,10 @@ spring:
             - RewritePath=/api/ticket-booking-service/(?<segment>.*), /api/${segment}
 
         - id: ticket-booking-service-websocket
-          uri: lb:ws://booking-service
+          uri: lb:ws://ticket-booking-service
           predicates:
-            - Path=/ws/bookings/**
+            - Path=/ws-booking
             - Header=Upgrade, websocket
-          filters:
-            - RewritePath=/ws/bookings/(?<segment>.*), /ws/${segment}
 
   lifecycle:
     timeout-per-shutdown-phase: 5s

@@ -18,7 +18,7 @@ export class WebsocketService implements OnDestroy {
   private client: Client;
   private state: BehaviorSubject<SocketClientState>;
   private topicSubscriptions: Map<string, StompSubscription> = new Map();
-  private SOCKET_SERVER_URL = `${environment.SERVER_API_URL}ws`;
+  private SOCKET_SERVER_URL = `${environment.SERVER_API_URL}ws-booking`;
 
   constructor() {
     this.client = new Client({
