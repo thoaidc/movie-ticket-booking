@@ -24,7 +24,7 @@ public class Booking {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "customer_id", nullable = false)
+    @Column(name = "customer_id")
     private Integer customerId;
 
     @Column(name = "show_id", nullable = false)
@@ -37,7 +37,7 @@ public class Booking {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "UTC")
     private Instant createTime;
 
-    @Column(name = "status", length = 10, nullable = false)
+    @Column(name = "status", length = 20, nullable = false)
     private String status;
 
     public Integer getId() {

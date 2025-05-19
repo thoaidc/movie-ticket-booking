@@ -46,7 +46,7 @@ public class SagaConsumer {
 
             replyMessage.setSagaId(command.getSagaId());
             replyMessage.setStatus(Objects.nonNull(customer) && customer.getId() > 0);
-            replyMessage.setResult(customer);
+            replyMessage.setResult(customer.getId());
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {

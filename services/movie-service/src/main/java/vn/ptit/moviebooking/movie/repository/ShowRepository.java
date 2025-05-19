@@ -15,13 +15,15 @@ public interface ShowRepository extends JpaRepository<Show, Integer> {
     @Query(
         value = """
             SELECT s.id,
+                s.movie_id as movieId,
+                s.cinema_room_id as roomId,
                 s.status,
                 s.ticket_price as ticketPrice,
                 s.start_time as startTime,
                 s.end_time as endTime,
                 m.name as movie,
                 cr.name as room
-            FROM hdv_movie.show s
+            FROM hdv_movie.show_time s
             JOIN hdv_movie.movie m ON s.movie_id = m.id
             JOIN hdv_movie.cinema_room cr on s.cinema_room_id = cr.id
             WHERE s.movie_id = ?1

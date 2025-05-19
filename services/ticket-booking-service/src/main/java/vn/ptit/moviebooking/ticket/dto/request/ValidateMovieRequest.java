@@ -1,12 +1,9 @@
 package vn.ptit.moviebooking.ticket.dto.request;
 
-import java.util.List;
-
 public class ValidateMovieRequest {
 
     private Integer showId;
-    private List<Integer> seatIds;
-    private Float totalAmount;
+    private Integer movieId;
 
     public Integer getShowId() {
         return showId;
@@ -16,19 +13,11 @@ public class ValidateMovieRequest {
         this.showId = showId;
     }
 
-    public List<Integer> getSeatIds() {
-        return seatIds;
+    public Integer getMovieId() {
+        return movieId;
     }
 
-    public void setSeatIds(List<Integer> seatIds) {
-        this.seatIds = seatIds;
-    }
-
-    public Float getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(Float totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setMovieId(Integer movieId) {
+        this.movieId = movieId;
     }
 }

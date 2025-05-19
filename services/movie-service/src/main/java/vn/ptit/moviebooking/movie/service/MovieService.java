@@ -3,6 +3,7 @@ package vn.ptit.moviebooking.movie.service;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import vn.ptit.moviebooking.movie.constants.HttpStatusConstants;
 import vn.ptit.moviebooking.movie.dto.request.BaseRequestDTO;
 import vn.ptit.moviebooking.movie.dto.request.ValidateMovieRequest;
 import vn.ptit.moviebooking.movie.dto.response.BaseResponseDTO;
@@ -15,7 +16,9 @@ import vn.ptit.moviebooking.movie.repository.MovieRepository;
 import vn.ptit.moviebooking.movie.repository.SeatRepository;
 import vn.ptit.moviebooking.movie.repository.ShowRepository;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MovieService {
@@ -39,7 +42,13 @@ public class MovieService {
     }
 
     public BaseResponseDTO validateMovieInfo(ValidateMovieRequest request) {
-        return BaseResponseDTO.builder().ok();
+        Optional<Movie> movie = movieRepository.findById(request.getMovieId());
+        Optional<Show> show = showRepository.findById(request.getShowId());
+
+        if (movie.isPresent() && show.isPresent() && Instant.now().isBefore(show.get().getStartTime()))
+            return BaseResponseDTO.builder().ok();
+
+        return BaseResponseDTO.builder().code(HttpStatusConstants.BAD_REQUEST).success(false).build();
     }
 
     public BaseResponseDTO getAllMovieWithPaging(BaseRequestDTO request) {

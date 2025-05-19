@@ -15,8 +15,7 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
     @Query(
         value = """
             SELECT * FROM hdv_movie.movie m
-            WHERE 1 = 1
-                AND (:keyword IS NULL OR (m.name LIKE :keyword OR m.director LIKE :keyword OR m.genre LIKE :keyword))
+            WHERE (:keyword IS NULL OR (m.name LIKE :keyword OR m.director LIKE :keyword OR m.genre LIKE :keyword))
                 AND (:fromDate IS NULL OR m.release_date >= :fromDate)
                 AND (:toDate IS NULL OR m.release_date <= :toDate)
         """,

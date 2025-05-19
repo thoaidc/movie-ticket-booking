@@ -5,6 +5,7 @@ import java.util.List;
 public class BookingRequest {
 
     private Integer showId;
+    private Integer movieId;
     private List<Integer> seatIds;
     private Float totalAmount;
 
@@ -30,5 +31,13 @@ public class BookingRequest {
 
     public void setTotalAmount(Float totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public Integer getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(Integer movieId) {
+        this.movieId = movieId;
     }
 }

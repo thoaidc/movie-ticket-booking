@@ -10,7 +10,7 @@ USE `hdv_ticket_booking`;
 DROP TABLE IF EXISTS `booking`;
 CREATE TABLE `booking` (
     `id` int NOT NULL AUTO_INCREMENT,
-    `customer_id` int NOT NULL,
+    `customer_id` int,
     `show_id` int NOT NULL,
     `total_amount` bigint NOT NULL,
     `create_time` timestamp NOT NULL,

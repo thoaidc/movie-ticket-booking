@@ -3,17 +3,13 @@ package vn.ptit.moviebooking.ticket.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import vn.ptit.moviebooking.ticket.constants.TicketBookingConstants;
+import vn.ptit.moviebooking.ticket.constants.BookingConstants;
 import vn.ptit.moviebooking.ticket.dto.request.BookingRequest;
-import vn.ptit.moviebooking.ticket.dto.request.CheckSeatAvailabilityRequest;
 import vn.ptit.moviebooking.ticket.dto.request.CheckSeatAvailabilityRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.ConfirmSeatsRequestCommand;
-import vn.ptit.moviebooking.ticket.dto.request.PaymentRequestCommand;
-import vn.ptit.moviebooking.ticket.dto.request.RefundRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.ReleasedSeatsRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.ValidateMovieRequest;
 import vn.ptit.moviebooking.ticket.dto.request.ValidateMovieRequestCommand;
-import vn.ptit.moviebooking.ticket.dto.request.VerifyCustomerRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.response.BaseCommandReplyMessage;
 import vn.ptit.moviebooking.ticket.entity.Booking;
 import vn.ptit.moviebooking.ticket.entity.BookingSeat;
@@ -44,7 +40,7 @@ public class TicketBookingService {
         Booking booking = new Booking();
         booking.setShowId(bookingRequest.getShowId());
         booking.setTotalAmount(bookingRequest.getTotalAmount());
-        booking.setStatus(TicketBookingConstants.BookingStatus.PENDING);
+        booking.setStatus(BookingConstants.Status.PENDING);
         booking.setCreateTime(Instant.now());
         ticketBookingRepository.save(booking);
 
@@ -66,10 +62,9 @@ public class TicketBookingService {
         Booking booking = createBooking(bookingRequest);
         ValidateMovieRequestCommand validateMovieCommand = new ValidateMovieRequestCommand();
         ValidateMovieRequest validateMovieRequest = new ValidateMovieRequest();
-        validateMovieCommand.setSagaId(booking.getId());
+        validateMovieRequest.setMovieId(bookingRequest.getMovieId());
         validateMovieRequest.setShowId(booking.getShowId());
-        validateMovieRequest.setSeatIds(bookingRequest.getSeatIds());
-        validateMovieRequest.setTotalAmount(booking.getTotalAmount());
+        validateMovieCommand.setSagaId(booking.getId());
         validateMovieCommand.setValidateMovieRequest(validateMovieRequest);
 
         return validateMovieCommand;
@@ -77,58 +72,47 @@ public class TicketBookingService {
 
     public CheckSeatAvailabilityRequestCommand createCheckSeatsAvailabilityCommand(BaseCommandReplyMessage request) {
         CheckSeatAvailabilityRequestCommand command = new CheckSeatAvailabilityRequestCommand();
-        CheckSeatAvailabilityRequest checkSeatAvailabilityRequest = new CheckSeatAvailabilityRequest();
-        checkSeatAvailabilityRequest.setShowId(1);
-        checkSeatAvailabilityRequest.setSeatIds(List.of());
+        command.setSeatIds(bookingSeatRepository.findAllSeatIdsByBookingId(request.getSagaId()));
         command.setSagaId(request.getSagaId());
-        command.setCheckSeatAvailabilityRequest(checkSeatAvailabilityRequest);
-
         return command;
     }
 
     public ConfirmSeatsRequestCommand createConfirmBookingSeatsCommand(BaseCommandReplyMessage request) {
         ConfirmSeatsRequestCommand command = new ConfirmSeatsRequestCommand();
-
+        command.setSeatIds(bookingSeatRepository.findAllSeatIdsByBookingId(request.getSagaId()));
+        command.setSagaId(request.getSagaId());
         return command;
     }
 
     public ReleasedSeatsRequestCommand createReleasedBookingSeatsCommand(BaseCommandReplyMessage request) {
         ReleasedSeatsRequestCommand command = new ReleasedSeatsRequestCommand();
-
+        command.setSeatIds(bookingSeatRepository.findAllSeatIdsByBookingId(request.getSagaId()));
+        command.setSagaId(request.getSagaId());
         return command;
     }
 
-    public VerifyCustomerRequestCommand createVerifyCustomerCommand(BaseCommandReplyMessage request) {
-        VerifyCustomerRequestCommand command = new VerifyCustomerRequestCommand();
-
-        return command;
-    }
-
-    public PaymentRequestCommand createPaymentProcessCommand(BaseCommandReplyMessage request) {
-        PaymentRequestCommand command = new PaymentRequestCommand();
-
-        return command;
-    }
-
-    public RefundRequestCommand createRefundCommand(BaseCommandReplyMessage request) {
-        RefundRequestCommand command = new RefundRequestCommand();
-
-        return command;
-    }
-
-    public void approveBooking(BaseCommandReplyMessage request) {
-
-    }
-
-    public void cancelBooking(BaseCommandReplyMessage request) {
+    public void updateBookingCustomerInfo(BaseCommandReplyMessage request) {
+        Integer customerId = (Integer) request.getResult();
         Optional<Booking> bookingOptional = ticketBookingRepository.findById(request.getSagaId());
+
+        if (bookingOptional.isEmpty()) {
+            throw new BaseBadRequestException(ENTITY_NAME, "Booking not exists, cannot update customer info");
+        }
+
+        Booking booking = bookingOptional.get();
+        booking.setCustomerId(customerId);
+        ticketBookingRepository.save(booking);
+    }
+
+    public void updateBookingStatus(Integer bookingId, String status) {
+        Optional<Booking> bookingOptional = ticketBookingRepository.findById(bookingId);
 
         if (bookingOptional.isEmpty()) {
             throw new BaseBadRequestException(ENTITY_NAME, "Booking not exists, cannot update status");
         }
 
         Booking booking = bookingOptional.get();
-        booking.setStatus(TicketBookingConstants.BookingStatus.CANCELLED);
+        booking.setStatus(status);
         ticketBookingRepository.save(booking);
     }
 }

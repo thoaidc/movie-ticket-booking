@@ -1,14 +1,16 @@
 package vn.ptit.moviebooking.ticket.dto.request;
 
+import java.util.List;
+
 public class ConfirmSeatsRequestCommand extends BaseCommandDTO {
 
-    private ConfirmSeatsRequest confirmSeatsRequest;
+    private List<Integer> seatIds;
 
-    public ConfirmSeatsRequest getConfirmSeatsRequest() {
-        return confirmSeatsRequest;
+    public List<Integer> getSeatIds() {
+        return seatIds;
     }
 
-    public void setConfirmSeatsRequest(ConfirmSeatsRequest confirmSeatsRequest) {
-        this.confirmSeatsRequest = confirmSeatsRequest;
+    public void setSeatIds(List<Integer> seatIds) {
+        this.seatIds = seatIds;
     }
 }
