@@ -5,6 +5,8 @@ import {provideLoadingBar} from '@ngx-loading-bar/core';
 import {provideLoadingBarRouter} from '@ngx-loading-bar/router';
 import {provideToastr} from 'ngx-toastr';
 import {APP_ROUTES} from './app.routes';
+import {provideHttpClient, withFetch, withInterceptors} from '@angular/common/http';
+import {ApiInterceptorFn} from './core/interceptors/api.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,6 +15,10 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideLoadingBar({ latencyThreshold: 0 }), // The request takes more than 0ms to start showing the loading bar
     provideLoadingBarRouter(), // To load according to route change
-    provideToastr()
+    provideToastr(),
+    provideHttpClient(
+      withFetch(), // To let HttpClient use Fetch API instead of XMLHttpRequest (XHR)
+      withInterceptors([ApiInterceptorFn])
+    )
   ]
 };
