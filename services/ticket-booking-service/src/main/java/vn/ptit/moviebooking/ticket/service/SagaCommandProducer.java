@@ -1,6 +1,5 @@
 package vn.ptit.moviebooking.ticket.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 
 import org.slf4j.Logger;
@@ -10,16 +9,19 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
+import vn.ptit.moviebooking.ticket.constants.BookingConstants;
 import vn.ptit.moviebooking.ticket.constants.HttpStatusConstants;
 import vn.ptit.moviebooking.ticket.constants.RabbitMQConstants;
 import vn.ptit.moviebooking.ticket.constants.WebSocketConstants;
 import vn.ptit.moviebooking.ticket.dto.request.BookingRequest;
 import vn.ptit.moviebooking.ticket.dto.request.CheckSeatAvailabilityRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.ConfirmSeatsRequestCommand;
+import vn.ptit.moviebooking.ticket.dto.request.PaymentRequest;
 import vn.ptit.moviebooking.ticket.dto.request.PaymentRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.RefundRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.ReleasedSeatsRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.ValidateMovieRequestCommand;
+import vn.ptit.moviebooking.ticket.dto.request.VerifyCustomerRequest;
 import vn.ptit.moviebooking.ticket.dto.request.VerifyCustomerRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.response.BaseCommandReplyMessage;
 import vn.ptit.moviebooking.ticket.dto.response.BaseResponseDTO;
@@ -33,27 +35,24 @@ public class SagaCommandProducer {
     private final RabbitMQProducer rabbitMQProducer;
     private final TicketBookingService ticketBookingService;
     private final WebSocketNotificationService notificationService;
-    private final ObjectMapper objectMapper;
-
     public SagaCommandProducer(RabbitMQProducer rabbitMQProducer,
                                TicketBookingService ticketBookingService,
-                               WebSocketNotificationService notificationService,
-                               ObjectMapper objectMapper) {
+                               WebSocketNotificationService notificationService) {
         this.rabbitMQProducer = rabbitMQProducer;
         this.ticketBookingService = ticketBookingService;
         this.notificationService = notificationService;
-        this.objectMapper = objectMapper;
     }
 
     public BaseResponseDTO createBookingSagaOrchestrator(BookingRequest bookingRequest) {
         // Create booking with PENDING status
         ValidateMovieRequestCommand command = ticketBookingService.createValidateMovieCommand(bookingRequest);
         rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.MOVIE_VALIDATE_COMMAND, command);
-        return BaseResponseDTO.builder().ok("Create booking request successfully!");
+        log.debug("[BOOKING] - Create booking with status PENDING and sagaId: {}", command.getSagaId());
+        return BaseResponseDTO.builder().message("Create booking request successfully!").ok(command.getSagaId());
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.MOVIE_VALIDATE_REPLY)
-    public void handleMovieValidateReply(String message, Channel channel, Message amqpMessage) {
+    public void handleMovieValidateReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
@@ -61,18 +60,19 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             // Movie validate successfully -> Check availability seats + Hold seats to payment
             if (replyMessage.isSuccess()) {
                 CheckSeatAvailabilityRequestCommand command =
                         ticketBookingService.createCheckSeatsAvailabilityCommand(replyMessage);
 
                 response = BaseResponseDTO.builder().message("Movie verified successfully!").ok();
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.MOVIE_VERIFIED);
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.CHECK_SEATS_AVAILABILITY_COMMAND, command);
+                log.debug("[BOOKING] - Movie information verified successfully");
             } else {
                 // Movie validate failed -> Cancel booking
-                ticketBookingService.cancelBooking(replyMessage);
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
+                log.debug("[BOOKING] - Movie information verified failed! Cancel booking.");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -85,7 +85,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.CHECK_SEATS_AVAILABILITY_REPLY)
-    public void handleSeatsAvailabilityCheckingReply(String message, Channel channel, Message amqpMessage) {
+    public void handleSeatsAvailabilityCheckingReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
@@ -93,16 +93,15 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             // Seats availability + Held seats successfully -> Verify customer + Save customer info
             if (replyMessage.isSuccess()) {
-                response = BaseResponseDTO.builder().message("Seat held successfully!").ok();
-                VerifyCustomerRequestCommand command = ticketBookingService.createVerifyCustomerCommand(replyMessage);
-                rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.VERIFY_CUSTOMER_COMMAND, command);
+                response = BaseResponseDTO.builder().message("Seats held successfully!").ok();
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.SEAT_RESERVED);
+                log.debug("[BOOKING] - Seats availability! Seats held successfully!");
             } else {
                 // Seats unavailability / Held seats failed -> Cancel booking
-                ticketBookingService.cancelBooking(replyMessage);
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
+                log.debug("[BOOKING] - Seats unavailability or held failed! Cancel booking.");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -114,8 +113,16 @@ public class SagaCommandProducer {
         notificationService.sendMessageToTopic(WebSocketConstants.Topic.BOOKING_TOPIC, response);
     }
 
+    public BaseResponseDTO verifyCustomerInfo(VerifyCustomerRequest verifyCustomerRequest) {
+        VerifyCustomerRequestCommand command = new VerifyCustomerRequestCommand();
+        command.setSagaId(verifyCustomerRequest.getBookingId());
+        command.setVerifyCustomerRequest(verifyCustomerRequest);
+        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.VERIFY_CUSTOMER_COMMAND, command);
+        return BaseResponseDTO.builder().ok();
+    }
+
     @RabbitListener(queues = RabbitMQConstants.Queue.VERIFY_CUSTOMER_REPLY)
-    public void handleVerifyCustomerReply(String message, Channel channel, Message amqpMessage) {
+    public void handleVerifyCustomerReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
@@ -123,18 +130,18 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             // Customer verified successfully -> Payment process
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Your information verified successfully!").ok();
-                PaymentRequestCommand command = ticketBookingService.createPaymentProcessCommand(replyMessage);
-                rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.PAYMENT_PROCESS_COMMAND, command);
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.CUSTOMER_VERIFIED);
+                ticketBookingService.updateBookingCustomerInfo(replyMessage);
+                log.debug("[BOOKING] - Customer information verified successfully!");
             } else {
                 // Verified failed -> Reserve held booking seats + Cancel booking
-                ticketBookingService.cancelBooking(replyMessage);
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
                 ReleasedSeatsRequestCommand command = ticketBookingService.createReleasedBookingSeatsCommand(replyMessage);
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.RELEASED_SEATS_COMMAND, command);
+                log.debug("[BOOKING] - Customer information verified failed! Cancel booking.");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -146,8 +153,16 @@ public class SagaCommandProducer {
         notificationService.sendMessageToTopic(WebSocketConstants.Topic.BOOKING_TOPIC, response);
     }
 
+    public BaseResponseDTO payment(PaymentRequest paymentRequest) {
+        PaymentRequestCommand command = new PaymentRequestCommand();
+        command.setSagaId(paymentRequest.getBookingId());
+        command.setPaymentRequest(paymentRequest);
+        rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.PAYMENT_PROCESS_COMMAND, command);
+        return BaseResponseDTO.builder().ok();
+    }
+
     @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_PROCESS_REPLY)
-    public void handlePaymentProcessReply(String message, Channel channel, Message amqpMessage) {
+    public void handlePaymentProcessReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
@@ -155,18 +170,19 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             // Payment successfully -> Confirm booking seats
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Payment successfully!").ok();
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.PAID);
                 ConfirmSeatsRequestCommand command = ticketBookingService.createConfirmBookingSeatsCommand(replyMessage);
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.CONFIRM_SEATS_COMMAND, command);
+                log.debug("[BOOKING] - Payment successfully!");
             } else {
                 // Payment failed -> Reserve held booking seats + Cancel booking
-                ticketBookingService.cancelBooking(replyMessage);
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
                 ReleasedSeatsRequestCommand command = ticketBookingService.createReleasedBookingSeatsCommand(replyMessage);
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.RELEASED_SEATS_COMMAND, command);
+                log.debug("[BOOKING] - Payment failed! Cancel booking.");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -179,7 +195,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.CONFIRM_SEATS_REPLY)
-    public void handleConfirmBookingSeatsReply(String message, Channel channel, Message amqpMessage) {
+    public void handleConfirmBookingSeatsReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
@@ -187,19 +203,21 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             // Booked seats successfully -> Confirm order completed
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Booking successfully!").ok();
-                ticketBookingService.approveBooking(replyMessage);
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.COMPLETED);
+                log.debug("[BOOKING] - Confirm booked seats! Booking completed.");
             } else {
                 // Booked seats failed -> Refund to customer + Reserve held booking seats + Cancel booking
-                ticketBookingService.cancelBooking(replyMessage);
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
                 ReleasedSeatsRequestCommand command = ticketBookingService.createReleasedBookingSeatsCommand(replyMessage);
-                RefundRequestCommand refundCommand = ticketBookingService.createRefundCommand(replyMessage);
+                RefundRequestCommand refundCommand = new RefundRequestCommand();
+                refundCommand.setSagaId(replyMessage.getSagaId());
+                refundCommand.setReason("Confirmation of booked seat failed!");
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.RELEASED_SEATS_COMMAND, command);
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.PAYMENT_REFUND_COMMAND, refundCommand);
+                log.debug("[BOOKING] - Confirm booked seats failed! Cancel booking.");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -212,7 +230,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.RELEASED_SEATS_REPLY)
-    public void handleReserveSeatsReply(String message, Channel channel, Message amqpMessage) {
+    public void handleReserveSeatsReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         // When customer verified fail / Payment failed / Confirm booking seats failed
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
@@ -221,10 +239,11 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Reserve booked seats successfully!").ok();
+                log.debug("[BOOKING] - Reserve booked seats successfully!");
+            } else {
+                log.debug("[BOOKING] - Reserve booked seats failed!");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -237,7 +256,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_REFUND_REPLY)
-    public void handleRefundReply(String message, Channel channel, Message amqpMessage) {
+    public void handleRefundReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         // When confirm booking seats failed
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
@@ -246,10 +265,11 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Refund to customer successfully!").ok();
+                log.debug("[BOOKING] - Refund to customer successfully!");
+            } else {
+                log.debug("[BOOKING] - Refund to customer failed!");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);

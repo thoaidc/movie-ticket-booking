@@ -14,7 +14,7 @@ CREATE TABLE `notification` (
     `receiver` varchar(100) NOT NULL,
     `title` varchar(255) NOT NULL,
     `content` VARCHAR(1000) NOT NULL,
-    `status` ENUM('PROCESSING', 'SUCCESS', 'FAILED') NOT NULL DEFAULT 'PROCESSING',
+    `status` VARCHAR(20) NOT NULL DEFAULT 'PROCESSING',
     `sent_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     INDEX idx_receiver (receiver),

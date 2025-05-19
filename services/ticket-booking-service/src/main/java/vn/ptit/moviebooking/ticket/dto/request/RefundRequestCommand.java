@@ -2,13 +2,13 @@ package vn.ptit.moviebooking.ticket.dto.request;
 
 public class RefundRequestCommand extends BaseCommandDTO {
 
-    private RefundRequest refundRequest;
+    private String reason;
 
-    public RefundRequest getRefundRequest() {
-        return refundRequest;
+    public String getReason() {
+        return reason;
     }
 
-    public void setRefundRequest(RefundRequest refundRequest) {
-        this.refundRequest = refundRequest;
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }

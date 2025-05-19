@@ -55,7 +55,13 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics
   endpoint:
     health:
       show-details: always
+      group:
+        readiness:
+          include: db,ping
+  health:
+    db:
+      enabled: true

@@ -6,7 +6,9 @@ import java.time.Instant;
 
 public interface ShowDTO {
 
-    String getId();
+    Integer getId();
+    Integer getMovieId();
+    Integer getRoomId();
     String getMovie();
     String getRoom();
     Float getTicketPrice();

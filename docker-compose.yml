@@ -11,6 +11,12 @@ services:
     networks:
       - hdv-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   # API Gateway
   hdv-api-gateway:
@@ -22,29 +28,18 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
     depends_on:
       hdv-service-registry:
-        condition: service_started
-    networks:
-      - hdv-network
-    restart: unless-stopped
-
-  # MySQL database for each service
-  hdv-customer-db:
-    image: mysql:8.0.40-oracle
-    container_name: hdv-customer-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hdv_customer
-    volumes:
-      - hdv_customer_data:/var/lib/mysql
+        condition: service_healthy
     networks:
       - hdv-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
       interval: 10s
-      timeout: 10s
-      retries: 10
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
+  # MySQL database for each service
   hdv-movie-db:
     image: mysql:8.0.40-oracle
     container_name: hdv-movie-db
@@ -57,41 +52,7 @@ services:
       - hdv-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-
-  hdv-notification-db:
-    image: mysql:8.0.40-oracle
-    container_name: hdv-notification-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hdv_notification
-    volumes:
-      - hdv_notification_data:/var/lib/mysql
-    networks:
-      - hdv-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-
-  hdv-payment-db:
-    image: mysql:8.0.40-oracle
-    container_name: hdv-payment-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hdv_payment
-    volumes:
-      - hdv_payment_data:/var/lib/mysql
-    networks:
-      - hdv-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
       interval: 10s
       timeout: 10s
       retries: 10
@@ -108,7 +69,44 @@ services:
       - hdv-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  hdv-customer-db:
+    image: mysql:8.0.40-oracle
+    container_name: hdv-customer-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hdv_customer
+    volumes:
+      - hdv_customer_data:/var/lib/mysql
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  hdv-payment-db:
+    image: mysql:8.0.40-oracle
+    container_name: hdv-payment-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hdv_payment
+    depends_on:
+      hdv-customer-db:
+        condition: service_healthy
+    volumes:
+      - hdv_payment_data:/var/lib/mysql
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
       interval: 10s
       timeout: 10s
       retries: 10
@@ -119,13 +117,33 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hdv_ticket_booking
+    depends_on:
+      hdv-payment-db:
+        condition: service_healthy
     volumes:
       - hdv_ticket_booking_data:/var/lib/mysql
     networks:
       - hdv-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  hdv-notification-db:
+    image: mysql:8.0.40-oracle
+    container_name: hdv-notification-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hdv_notification
+    volumes:
+      - hdv_notification_data:/var/lib/mysql
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
       interval: 10s
       timeout: 10s
       retries: 10
@@ -140,40 +158,23 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     depends_on:
-      hdv-customer-db:
-        condition: service_healthy
       hdv-movie-db:
-        condition: service_healthy
-      hdv-notification-db:
-        condition: service_healthy
-      hdv-payment-db:
         condition: service_healthy
       hdv-seat-availability-db:
         condition: service_healthy
+      hdv-customer-db:
+        condition: service_healthy
+      hdv-payment-db:
+        condition: service_healthy
       hdv-ticket-booking-db:
+        condition: service_healthy
+      hdv-notification-db:
         condition: service_healthy
     networks:
       - hdv-network
     restart: no  # Run once and then stop
 
   # Microservices
-  hdv-customer-service:
-    container_name: hdv-customer-service
-    build: ./services/customer-service
-    env_file:
-      - .env
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-customer-db:3306/hdv_customer?useSSL=false&allowPublicKeyRetrieval=true
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
-    depends_on:
-      hdv-customer-db:
-        condition: service_healthy
-      hdv-api-gateway:
-        condition: service_started
-    networks:
-      - hdv-network
-    restart: unless-stopped
-
   hdv-movie-service:
     container_name: hdv-movie-service
     build: ./services/movie-service
@@ -185,45 +186,19 @@ services:
     depends_on:
       hdv-movie-db:
         condition: service_healthy
-      hdv-api-gateway:
-        condition: service_started
-    networks:
-      - hdv-network
-    restart: unless-stopped
-
-  hdv-notification-service:
-    container_name: hdv-notification-service
-    build: ./services/notification-service
-    env_file:
-      - .env
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-notification-db:3306/hdv_notification?useSSL=false&allowPublicKeyRetrieval=true
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
-    depends_on:
-      hdv-notification-db:
+      hdv-service-registry:
         condition: service_healthy
       hdv-api-gateway:
-        condition: service_started
-    networks:
-      - hdv-network
-    restart: unless-stopped
-
-  hdv-payment-service:
-    container_name: hdv-payment-service
-    build: ./services/payment-service
-    env_file:
-      - .env
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-payment-db:3306/hdv_payment?useSSL=false&allowPublicKeyRetrieval=true
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
-    depends_on:
-      hdv-payment-db:
         condition: service_healthy
-      hdv-api-gateway:
-        condition: service_started
     networks:
       - hdv-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   hdv-seat-availability-service:
     container_name: hdv-seat-availability-service
@@ -236,11 +211,71 @@ services:
     depends_on:
       hdv-seat-availability-db:
         condition: service_healthy
+      hdv-service-registry:
+        condition: service_healthy
       hdv-api-gateway:
-        condition: service_started
+        condition: service_healthy
     networks:
       - hdv-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  hdv-customer-service:
+    container_name: hdv-customer-service
+    build: ./services/customer-service
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-customer-db:3306/hdv_customer?useSSL=false&allowPublicKeyRetrieval=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-customer-db:
+        condition: service_healthy
+      hdv-service-registry:
+        condition: service_healthy
+      hdv-api-gateway:
+        condition: service_healthy
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  hdv-payment-service:
+    container_name: hdv-payment-service
+    build: ./services/payment-service
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-payment-db:3306/hdv_payment?useSSL=false&allowPublicKeyRetrieval=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-payment-db:
+        condition: service_healthy
+      hdv-service-registry:
+        condition: service_healthy
+      hdv-api-gateway:
+        condition: service_healthy
+      hdv-customer-service:
+        condition: service_healthy
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   hdv-ticket-booking-service:
     container_name: hdv-ticket-booking-service
@@ -253,11 +288,75 @@ services:
     depends_on:
       hdv-ticket-booking-db:
         condition: service_healthy
+      hdv-service-registry:
+        condition: service_healthy
       hdv-api-gateway:
-        condition: service_started
+        condition: service_healthy
+      hdv-movie-service:
+        condition: service_healthy
+      hdv-seat-availability-service:
+        condition: service_healthy
+      hdv-payment-service:
+        condition: service_healthy
     networks:
       - hdv-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  hdv-notification-service:
+    container_name: hdv-notification-service
+    build: ./services/notification-service
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://hdv-notification-db:3306/hdv_notification?useSSL=false&allowPublicKeyRetrieval=true
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://hdv-service-registry:8761/eureka/
+    depends_on:
+      hdv-notification-db:
+        condition: service_healthy
+      hdv-service-registry:
+        condition: service_healthy
+      hdv-api-gateway:
+        condition: service_healthy
+      hdv-ticket-booking-service:
+        condition: service_healthy
+    networks:
+      - hdv-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  init-seats-of-shows-caller:
+    image: curlimages/curl:latest
+    container_name: hdv-init-seats-of-shows
+    volumes:
+      - ./scripts:/scripts  # Mount the ./scripts directory from the project to docker container
+    entrypoint: ["sh", "/scripts/init_seats_shows.sh"]
+    depends_on:
+      hdv-movie-db:
+        condition: service_healthy
+      hdv-seat-availability-db:
+        condition: service_healthy
+      hdv-service-registry:
+        condition: service_healthy
+      hdv-api-gateway:
+        condition: service_healthy
+      hdv-movie-service:
+        condition: service_healthy
+      hdv-seat-availability-service:
+        condition: service_healthy
+    networks:
+      - hdv-network
+    restart: no
 
   # Angular frontend service
   hdv-frontend:
@@ -267,9 +366,21 @@ services:
       - "4200:80"
     depends_on:
       hdv-service-registry:
-        condition: service_started
+        condition: service_healthy
       hdv-api-gateway:
-        condition: service_started
+        condition: service_healthy
+      hdv-movie-service:
+        condition: service_healthy
+      hdv-seat-availability-service:
+        condition: service_healthy
+      hdv-customer-service:
+        condition: service_healthy
+      hdv-payment-service:
+        condition: service_healthy
+      hdv-ticket-booking-service:
+        condition: service_healthy
+      hdv-notification-service:
+        condition: service_healthy
     networks:
       - hdv-network
     restart: unless-stopped
@@ -281,9 +392,9 @@ networks:
 
 # Define volumes
 volumes:
-  hdv_customer_data:
   hdv_movie_data:
-  hdv_notification_data:
-  hdv_payment_data:
   hdv_seat_availability_data:
+  hdv_customer_data:
+  hdv_payment_data:
   hdv_ticket_booking_data:
+  hdv_notification_data:

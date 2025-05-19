@@ -13,6 +13,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler;
 import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
@@ -24,10 +25,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.util.ErrorHandler;
 import org.springframework.util.StringUtils;
+
 import vn.ptit.moviebooking.seatavailability.config.properties.RabbitMQProperties;
 import vn.ptit.moviebooking.seatavailability.exception.BaseBadRequestException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,6 +41,7 @@ public class RabbitMQConfig {
     private final RabbitMQProperties rabbitMQConfig;
     private final ObjectMapper objectMapper;
     private static final String ENTITY_NAME = "RabbitMQConfig";
+    private static final Logger log = LoggerFactory.getLogger(RabbitMQConfig.class);
 
     public RabbitMQConfig(@Qualifier("rabbitMQProperties") RabbitMQProperties rabbitMQProperties,
                           ObjectMapper objectMapper) {
@@ -59,7 +63,7 @@ public class RabbitMQConfig {
      * @return a list of {@link Queue}
      */
     @Bean
-    public List<Queue> declareQueues() {
+    public List<Queue> declareQueues(RabbitAdmin rabbitAdmin) {
         List<Queue> queues = new ArrayList<>();
         boolean durable = true; // The queue persists after RabbitMQ restarts
         boolean exclusive = false; // The queue is not limited to one connection
@@ -72,6 +76,7 @@ public class RabbitMQConfig {
             if (StringUtils.hasText(queueName)) {
                 Queue queue = new Queue(queueName, durable, exclusive, autoDelete);
                 queues.add(queue);
+                rabbitAdmin.declareQueue(queue);
             }
         }
 
@@ -85,23 +90,32 @@ public class RabbitMQConfig {
      * @return a list of {@link Binding}
      */
     @Bean
-    public List<Binding> bindingQueues(DirectExchange directExchange) {
+    public List<Binding> bindingQueues(DirectExchange directExchange, RabbitAdmin rabbitAdmin) {
         if (Objects.isNull(directExchange)) {
             throw new BaseBadRequestException(ENTITY_NAME, "Direct exchange not exists");
         }
 
+        List<Queue> queues = declareQueues(rabbitAdmin);
         List<Binding> bindings = new ArrayList<>();
-        List<Queue> queues = declareQueues();
+        Map<String, String> queueNameToRoutingKey = new HashMap<>();
+
+        for (RabbitMQProperties.QueueConfig config : rabbitMQConfig.getQueues().values()) {
+            if (StringUtils.hasText(config.getName()) && StringUtils.hasText(config.getRoutingKey())) {
+                queueNameToRoutingKey.put(config.getName(), config.getRoutingKey());
+            }
+        }
 
         for (Queue queue : queues) {
-            if (Objects.nonNull(queue)) {
-                RabbitMQProperties.QueueConfig queueConfig = rabbitMQConfig.getQueues().get(queue.getName());
-                String routingKey = Objects.nonNull(queueConfig) ? queueConfig.getRoutingKey() : null;
+            String queueName = queue.getName();
+            String routingKey = queueNameToRoutingKey.get(queueName);
 
-                if (StringUtils.hasText(routingKey)) {
-                    Binding binding = BindingBuilder.bind(queue).to(directExchange).with(routingKey);
-                    bindings.add(binding);
-                }
+            if (StringUtils.hasText(routingKey)) {
+                Binding binding = BindingBuilder.bind(queue).to(directExchange).with(routingKey);
+                rabbitAdmin.declareBinding(binding);
+                bindings.add(binding);
+                log.info("Bound queue: `{}` with routing key: `{}`", queueName, routingKey);
+            } else {
+                log.warn("Queue `{}` does not have a corresponding routing key", queueName);
             }
         }
 
@@ -123,7 +137,18 @@ public class RabbitMQConfig {
         connectionFactory.setPassword(rabbitMQConfig.getPassword());
         connectionFactory.setVirtualHost(rabbitMQConfig.getVirtualHost());
 
+        connectionFactory.addConnectionListener(connection ->
+                log.info("Successfully connected to RabbitMQ at {}:{}", rabbitMQConfig.getHost(), rabbitMQConfig.getPort())
+        );
+
         return connectionFactory;
+    }
+
+    @Bean
+    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+        RabbitAdmin admin = new RabbitAdmin(connectionFactory);
+        admin.setAutoStartup(true);
+        return admin;
     }
 
     /**

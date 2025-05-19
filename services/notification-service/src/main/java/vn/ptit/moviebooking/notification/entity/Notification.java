@@ -35,7 +35,7 @@ public class Notification {
     @Column(name = "receiver", length = 100, nullable = false)
     private String receiver;
 
-    @Column(name = "status", length = 12, nullable = false)
+    @Column(name = "status", nullable = false)
     private String status;
 
     @Column(name = "sent_at")

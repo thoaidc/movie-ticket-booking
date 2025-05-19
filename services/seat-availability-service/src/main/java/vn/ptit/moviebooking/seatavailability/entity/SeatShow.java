@@ -27,7 +27,7 @@ public class SeatShow {
     @Column(name = "show_id", nullable = false)
     private Integer showId;
 
-    @Column(name = "status", length = 15, nullable = false)
+    @Column(name = "status", nullable = false)
     private String status;
 
     public Integer getId() {

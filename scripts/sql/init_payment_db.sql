@@ -13,7 +13,7 @@ CREATE TABLE `payment` (
     `booking_id` INT NOT NULL,
     `transaction_id` VARCHAR(255),
     `amount` DECIMAL(10,2) NOT NULL,
-    `status` ENUM('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED') NOT NULL DEFAULT 'PENDING',
+    `status` VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     `payment_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_payment_booking (booking_id),
     INDEX idx_payment_status (status),

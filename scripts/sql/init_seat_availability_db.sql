@@ -12,7 +12,7 @@ CREATE TABLE `seat_show` (
     `id` int NOT NULL AUTO_INCREMENT,
     `seat_id` int NOT NULL,
     `show_id` int NOT NULL,
-    `status` ENUM('AVAILABLE', 'RESERVED', 'BOOKED') NOT NULL DEFAULT 'AVAILABLE',
+    `status` VARCHAR(20) NOT NULL DEFAULT 'AVAILABLE',
     PRIMARY KEY (`id`),
     INDEX idx_seat_room (seat_id),
     INDEX idx_seat_show (show_id),

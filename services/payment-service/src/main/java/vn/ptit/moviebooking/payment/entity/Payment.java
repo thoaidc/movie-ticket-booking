@@ -33,7 +33,7 @@ public class Payment {
     @Column(name = "amount", nullable = false)
     private Float amount;
 
-    @Column(name = "status", length = 10, nullable = false)
+    @Column(name = "status", nullable = false)
     private String status;
 
     @Column(name = "payment_time", nullable = false)

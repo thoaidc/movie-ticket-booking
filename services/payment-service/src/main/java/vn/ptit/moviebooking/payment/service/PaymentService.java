@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.ptit.moviebooking.payment.constants.PaymentConstants;
 import vn.ptit.moviebooking.payment.dto.request.PaymentRequest;
-import vn.ptit.moviebooking.payment.dto.request.RefundRequest;
+import vn.ptit.moviebooking.payment.dto.request.RefundProcessCommand;
 import vn.ptit.moviebooking.payment.entity.Payment;
 import vn.ptit.moviebooking.payment.entity.Refund;
 import vn.ptit.moviebooking.payment.repository.PaymentRepository;
@@ -47,14 +47,10 @@ public class PaymentService {
     }
 
     @Transactional
-    public Refund refund(RefundRequest refundRequest) {
+    public Refund refund(RefundProcessCommand refundRequest) {
         Refund refund = new Refund();
-
-        refund.setPaymentId(refundRequest.getPaymentId());
-        refund.setAmount(refundRequest.getAmount());
         refund.setReason(refundRequest.getReason());
         refund.setRefundTime(Instant.now());
-
         return refundRepository.save(refund);
     }
 }

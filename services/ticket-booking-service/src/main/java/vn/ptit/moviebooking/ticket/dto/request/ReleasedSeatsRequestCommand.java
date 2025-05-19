@@ -1,14 +1,16 @@
 package vn.ptit.moviebooking.ticket.dto.request;
 
+import java.util.List;
+
 public class ReleasedSeatsRequestCommand extends BaseCommandDTO {
 
-    private ReleasedSeatsRequest releasedSeatsRequest;
+    private List<Integer> seatIds;
 
-    public ReleasedSeatsRequest getReleasedSeatsRequest() {
-        return releasedSeatsRequest;
+    public List<Integer> getSeatIds() {
+        return seatIds;
     }
 
-    public void setReleasedSeatsRequest(ReleasedSeatsRequest releasedSeatsRequest) {
-        this.releasedSeatsRequest = releasedSeatsRequest;
+    public void setSeatIds(List<Integer> seatIds) {
+        this.seatIds = seatIds;
     }
 }

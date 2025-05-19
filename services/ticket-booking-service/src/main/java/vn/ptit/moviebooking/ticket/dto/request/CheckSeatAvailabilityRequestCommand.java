@@ -1,14 +1,16 @@
 package vn.ptit.moviebooking.ticket.dto.request;
 
+import java.util.List;
+
 public class CheckSeatAvailabilityRequestCommand extends BaseCommandDTO {
 
-    private CheckSeatAvailabilityRequest checkSeatAvailabilityRequest;
+    private List<Integer> seatIds;
 
-    public CheckSeatAvailabilityRequest getCheckSeatAvailabilityRequest() {
-        return checkSeatAvailabilityRequest;
+    public List<Integer> getSeatIds() {
+        return seatIds;
     }
 
-    public void setCheckSeatAvailabilityRequest(CheckSeatAvailabilityRequest checkSeatAvailabilityRequest) {
-        this.checkSeatAvailabilityRequest = checkSeatAvailabilityRequest;
+    public void setSeatIds(List<Integer> seatIds) {
+        this.seatIds = seatIds;
     }
 }

@@ -33,7 +33,7 @@ public class Show {
     @Column(name = "ticket_price", nullable = false)
     private Float ticketPrice;
 
-    @Column(name = "status", length = 10, nullable = false)
+    @Column(name = "status", nullable = false)
     private String status;
 
     @Column(name = "start_time", nullable = false)

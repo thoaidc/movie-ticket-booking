@@ -33,7 +33,7 @@ public class Seat {
     @Column(name = "code", length = 10, nullable = false)
     private String code;
 
-    @Column(name = "status", length = 10, nullable = false)
+    @Column(name = "status", nullable = false)
     private String status;
 
     public Integer getId() {

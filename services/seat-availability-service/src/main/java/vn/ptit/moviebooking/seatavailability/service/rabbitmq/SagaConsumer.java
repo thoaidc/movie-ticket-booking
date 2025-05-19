@@ -1,6 +1,5 @@
 package vn.ptit.moviebooking.seatavailability.service.rabbitmq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 
 import org.springframework.amqp.core.Message;
@@ -20,22 +19,18 @@ public class SagaConsumer {
 
     private final RabbitMQProducer rabbitMQProducer;
     private final CheckSeatAvailabilityService checkSeatAvailabilityService;
-    private final ObjectMapper objectMapper;
 
     public SagaConsumer(RabbitMQProducer rabbitMQProducer,
-                        CheckSeatAvailabilityService checkSeatAvailabilityService,
-                        ObjectMapper objectMapper) {
+                        CheckSeatAvailabilityService checkSeatAvailabilityService) {
         this.rabbitMQProducer = rabbitMQProducer;
         this.checkSeatAvailabilityService = checkSeatAvailabilityService;
-        this.objectMapper = objectMapper;
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.CHECK_SEATS_AVAILABILITY_COMMAND)
-    public void handleCheckSeatAvailabilityRequest(String message, Channel channel, Message amqpMessage) {
+    public void handleCheckSeatAvailabilityRequest(SeatsCommand command, Channel channel, Message amqpMessage) {
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            SeatsCommand command = objectMapper.readValue(message, SeatsCommand.class);
             BaseResponseDTO response = checkSeatAvailabilityService.checkSeatsAvailability(command);
             replyMessage.setSagaId(command.getSagaId());
             replyMessage.setStatus(response.getStatus());
@@ -48,11 +43,10 @@ public class SagaConsumer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.CONFIRM_SEATS_COMMAND)
-    public void handleConfirmBookedSeatsRequest(String message, Channel channel, Message amqpMessage) {
+    public void handleConfirmBookedSeatsRequest(SeatsCommand command, Channel channel, Message amqpMessage) {
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            SeatsCommand command = objectMapper.readValue(message, SeatsCommand.class);
             BaseResponseDTO response = checkSeatAvailabilityService.confirmBookedSeats(command);
             replyMessage.setSagaId(command.getSagaId());
             replyMessage.setStatus(response.getStatus());
@@ -65,11 +59,10 @@ public class SagaConsumer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.RELEASED_SEATS_COMMAND)
-    public void handleReleaseBookedSeatsRequest(String message, Channel channel, Message amqpMessage) {
+    public void handleReleaseBookedSeatsRequest(SeatsCommand command, Channel channel, Message amqpMessage) {
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            SeatsCommand command = objectMapper.readValue(message, SeatsCommand.class);
             BaseResponseDTO response = checkSeatAvailabilityService.releasedBookedSeats(command);
             replyMessage.setSagaId(command.getSagaId());
             replyMessage.setStatus(response.getStatus());

@@ -61,13 +61,13 @@ spring:
             - RewritePath=/ws/bookings/(?<segment>.*), /ws/${segment}
 
   lifecycle:
-    timeout-per-shutdown-phase: 10s
+    timeout-per-shutdown-phase: 5s
 
 management:
   endpoints:
     web:
       exposure:
-        include: gateway,health,info
+        include: health,info,gateway
   endpoint:
     health:
       show-details: always

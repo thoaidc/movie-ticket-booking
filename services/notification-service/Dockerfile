@@ -24,6 +24,9 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
+# Install wget for health check
+RUN apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/*
+
 # Copy Spring Boot JAR from the build stage
 COPY --from=build /app/target/notification-service-*.jar app.jar
 

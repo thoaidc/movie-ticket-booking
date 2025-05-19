@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import vn.ptit.moviebooking.customer.dto.request.SaveCustomerRequest;
+import vn.ptit.moviebooking.customer.dto.request.VerifyCustomerRequest;
 import vn.ptit.moviebooking.customer.exception.BaseBadRequestException;
 import vn.ptit.moviebooking.customer.repository.CustomerRepository;
 import vn.ptit.moviebooking.customer.entity.Customer;
@@ -33,7 +33,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer saveCustomerInfo(@Valid SaveCustomerRequest request) {
+    public Customer saveCustomerInfo(@Valid VerifyCustomerRequest request) {
         Customer customer = new Customer();
         customer.setFullname(request.getFullname());
         customer.setEmail(request.getEmail());
