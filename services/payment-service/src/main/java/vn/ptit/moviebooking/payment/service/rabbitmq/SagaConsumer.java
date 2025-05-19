@@ -1,6 +1,5 @@
 package vn.ptit.moviebooking.payment.service.rabbitmq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import vn.ptit.moviebooking.payment.constants.RabbitMQConstants;
 import vn.ptit.moviebooking.payment.dto.request.PaymentProcessCommand;
 import vn.ptit.moviebooking.payment.dto.request.PaymentRequest;
 import vn.ptit.moviebooking.payment.dto.request.RefundProcessCommand;
-import vn.ptit.moviebooking.payment.dto.request.RefundRequest;
 import vn.ptit.moviebooking.payment.dto.response.BaseCommandReplyMessage;
 import vn.ptit.moviebooking.payment.entity.Payment;
 import vn.ptit.moviebooking.payment.entity.Refund;
@@ -29,25 +27,20 @@ public class SagaConsumer {
     private static final Logger log = LoggerFactory.getLogger(SagaConsumer.class);
     private final PaymentService paymentService;
     private final RabbitMQProducer rabbitMQProducer;
-    private final ObjectMapper objectMapper;
 
     public SagaConsumer(PaymentService paymentService,
-                        RabbitMQProducer rabbitMQProducer,
-                        ObjectMapper objectMapper) {
+                        RabbitMQProducer rabbitMQProducer) {
         this.paymentService = paymentService;
         this.rabbitMQProducer = rabbitMQProducer;
-        this.objectMapper = objectMapper;
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_PROCESS_COMMAND)
-    public void handlePaymentProcessRequest(String message, Channel channel, Message amqpMessage) {
-        log.info("Received message from RabbitMQ: {}", message);
+    public void handlePaymentProcessRequest(PaymentProcessCommand command, Channel channel, Message amqpMessage) {
+        log.info("Received message from RabbitMQ: {}", command);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            PaymentProcessCommand command = objectMapper.readValue(message, PaymentProcessCommand.class);
             PaymentRequest paymentRequest = command.getPaymentRequest();
-
             Payment payment = paymentService.createPayment(paymentRequest);
             payment = paymentService.paymentProcessTest(payment);
 
@@ -65,15 +58,12 @@ public class SagaConsumer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_REFUND_COMMAND)
-    public void handleRefundRequest(String message, Channel channel, Message amqpMessage) {
-        log.info("Received message from RabbitMQ: {}", message);
+    public void handleRefundRequest(RefundProcessCommand command, Channel channel, Message amqpMessage) {
+        log.info("Received message from RabbitMQ: {}", command);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            RefundProcessCommand command = objectMapper.readValue(message, RefundProcessCommand.class);
-            RefundRequest refundRequest = command.getRefundRequest();
-            Refund refund = paymentService.refund(refundRequest);
-
+            Refund refund = paymentService.refund(command);
             replyMessage.setStatus(true);
             replyMessage.setResult(refund);
             replyMessage.setSagaId(command.getSagaId());

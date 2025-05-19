@@ -1,6 +1,5 @@
 package vn.ptit.moviebooking.customer.service.rabbitmq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,23 +23,19 @@ public class SagaConsumer {
     private static final Logger log = LoggerFactory.getLogger(SagaConsumer.class);
     private final RabbitMQProducer rabbitMQProducer;
     private final CustomerService customerService;
-    private final ObjectMapper objectMapper;
 
     public SagaConsumer(RabbitMQProducer rabbitMQProducer,
-                        CustomerService customerService,
-                        ObjectMapper objectMapper) {
+                        CustomerService customerService) {
         this.rabbitMQProducer = rabbitMQProducer;
         this.customerService = customerService;
-        this.objectMapper = objectMapper;
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.VERIFY_CUSTOMER_COMMAND)
-    public void handleVerifyCustomerRequest(String message, Channel channel, Message amqpMessage) {
-        log.info("Received message from RabbitMQ: {}", message);
+    public void handleVerifyCustomerRequest(VerifyCustomerCommand command, Channel channel, Message amqpMessage) {
+        log.info("Received message from RabbitMQ: {}", command);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            VerifyCustomerCommand command = objectMapper.readValue(message, VerifyCustomerCommand.class);
             SaveCustomerRequest saveCustomerRequest = command.getSaveCustomerRequest();
             Customer customer = customerService.saveCustomerInfo(saveCustomerRequest);
 

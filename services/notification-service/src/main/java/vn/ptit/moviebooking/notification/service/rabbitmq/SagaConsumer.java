@@ -1,6 +1,5 @@
 package vn.ptit.moviebooking.notification.service.rabbitmq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,23 +24,19 @@ public class SagaConsumer {
     private static final Logger log = LoggerFactory.getLogger(SagaConsumer.class);
     private final NotificationService notificationService;
     private final RabbitMQProducer rabbitMQProducer;
-    private final ObjectMapper objectMapper;
 
     public SagaConsumer(NotificationService notificationService,
-                        RabbitMQProducer rabbitMQProducer,
-                        ObjectMapper objectMapper) {
+                        RabbitMQProducer rabbitMQProducer) {
         this.notificationService = notificationService;
         this.rabbitMQProducer = rabbitMQProducer;
-        this.objectMapper = objectMapper;
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.NOTIFICATION_COMMAND)
-    public void handleNotificationRequest(String message, Channel channel, Message amqpMessage) {
-        log.info("Received message from RabbitMQ: {}", message);
+    public void handleNotificationRequest(NotificationProcessCommand command, Channel channel, Message amqpMessage) {
+        log.info("Received message from RabbitMQ: {}", command);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            NotificationProcessCommand command = objectMapper.readValue(message, NotificationProcessCommand.class);
             NotificationRequest notificationRequest = command.getNotificationRequest();
             Notification notification = notificationService.sendNotification(notificationRequest);
 

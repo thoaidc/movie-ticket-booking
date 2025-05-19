@@ -1,6 +1,5 @@
 package vn.ptit.moviebooking.ticket.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 
 import org.slf4j.Logger;
@@ -36,16 +35,12 @@ public class SagaCommandProducer {
     private final RabbitMQProducer rabbitMQProducer;
     private final TicketBookingService ticketBookingService;
     private final WebSocketNotificationService notificationService;
-    private final ObjectMapper objectMapper;
-
     public SagaCommandProducer(RabbitMQProducer rabbitMQProducer,
                                TicketBookingService ticketBookingService,
-                               WebSocketNotificationService notificationService,
-                               ObjectMapper objectMapper) {
+                               WebSocketNotificationService notificationService) {
         this.rabbitMQProducer = rabbitMQProducer;
         this.ticketBookingService = ticketBookingService;
         this.notificationService = notificationService;
-        this.objectMapper = objectMapper;
     }
 
     public BaseResponseDTO createBookingSagaOrchestrator(BookingRequest bookingRequest) {
@@ -57,7 +52,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.MOVIE_VALIDATE_REPLY)
-    public void handleMovieValidateReply(String message, Channel channel, Message amqpMessage) {
+    public void handleMovieValidateReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
@@ -65,8 +60,6 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             // Movie validate successfully -> Check availability seats + Hold seats to payment
             if (replyMessage.isSuccess()) {
                 CheckSeatAvailabilityRequestCommand command =
@@ -92,7 +85,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.CHECK_SEATS_AVAILABILITY_REPLY)
-    public void handleSeatsAvailabilityCheckingReply(String message, Channel channel, Message amqpMessage) {
+    public void handleSeatsAvailabilityCheckingReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
@@ -100,8 +93,6 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             // Seats availability + Held seats successfully -> Verify customer + Save customer info
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Seats held successfully!").ok();
@@ -131,7 +122,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.VERIFY_CUSTOMER_REPLY)
-    public void handleVerifyCustomerReply(String message, Channel channel, Message amqpMessage) {
+    public void handleVerifyCustomerReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
@@ -139,8 +130,6 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             // Customer verified successfully -> Payment process
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Your information verified successfully!").ok();
@@ -173,7 +162,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_PROCESS_REPLY)
-    public void handlePaymentProcessReply(String message, Channel channel, Message amqpMessage) {
+    public void handlePaymentProcessReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
@@ -181,8 +170,6 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             // Payment successfully -> Confirm booking seats
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Payment successfully!").ok();
@@ -208,7 +195,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.CONFIRM_SEATS_REPLY)
-    public void handleConfirmBookingSeatsReply(String message, Channel channel, Message amqpMessage) {
+    public void handleConfirmBookingSeatsReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
@@ -216,8 +203,6 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             // Booked seats successfully -> Confirm order completed
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Booking successfully!").ok();
@@ -245,7 +230,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.RELEASED_SEATS_REPLY)
-    public void handleReserveSeatsReply(String message, Channel channel, Message amqpMessage) {
+    public void handleReserveSeatsReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         // When customer verified fail / Payment failed / Confirm booking seats failed
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
@@ -254,8 +239,6 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Reserve booked seats successfully!").ok();
                 log.debug("[BOOKING] - Reserve booked seats successfully!");
@@ -273,7 +256,7 @@ public class SagaCommandProducer {
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_REFUND_REPLY)
-    public void handleRefundReply(String message, Channel channel, Message amqpMessage) {
+    public void handleRefundReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
         // When confirm booking seats failed
         BaseResponseDTO response = BaseResponseDTO.builder()
                 .code(HttpStatusConstants.BAD_REQUEST)
@@ -282,8 +265,6 @@ public class SagaCommandProducer {
                 .build();
 
         try {
-            BaseCommandReplyMessage replyMessage = objectMapper.readValue(message, BaseCommandReplyMessage.class);
-
             if (replyMessage.isSuccess()) {
                 response = BaseResponseDTO.builder().message("Refund to customer successfully!").ok();
                 log.debug("[BOOKING] - Refund to customer successfully!");

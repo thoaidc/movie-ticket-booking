@@ -30,6 +30,7 @@ import vn.ptit.moviebooking.ticket.config.properties.RabbitMQProperties;
 import vn.ptit.moviebooking.ticket.exception.BaseBadRequestException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -94,20 +95,27 @@ public class RabbitMQConfig {
             throw new BaseBadRequestException(ENTITY_NAME, "Direct exchange not exists");
         }
 
-        List<Binding> bindings = new ArrayList<>();
         List<Queue> queues = declareQueues(rabbitAdmin);
+        List<Binding> bindings = new ArrayList<>();
+        Map<String, String> queueNameToRoutingKey = new HashMap<>();
+
+        for (RabbitMQProperties.QueueConfig config : rabbitMQConfig.getQueues().values()) {
+            if (StringUtils.hasText(config.getName()) && StringUtils.hasText(config.getRoutingKey())) {
+                queueNameToRoutingKey.put(config.getName(), config.getRoutingKey());
+            }
+        }
 
         for (Queue queue : queues) {
-            if (Objects.nonNull(queue)) {
-                RabbitMQProperties.QueueConfig queueConfig = rabbitMQConfig.getQueues().get(queue.getName());
-                String routingKey = Objects.nonNull(queueConfig) ? queueConfig.getRoutingKey() : null;
+            String queueName = queue.getName();
+            String routingKey = queueNameToRoutingKey.get(queueName);
 
-                if (StringUtils.hasText(routingKey)) {
-                    Binding binding = BindingBuilder.bind(queue).to(directExchange).with(routingKey);
-                    rabbitAdmin.declareBinding(binding);
-                    bindings.add(binding);
-                    log.info("Defined queue: `{}` routing by key: `{}`", queue.getName(), routingKey);
-                }
+            if (StringUtils.hasText(routingKey)) {
+                Binding binding = BindingBuilder.bind(queue).to(directExchange).with(routingKey);
+                rabbitAdmin.declareBinding(binding);
+                bindings.add(binding);
+                log.info("Bound queue: `{}` with routing key: `{}`", queueName, routingKey);
+            } else {
+                log.warn("Queue `{}` does not have a corresponding routing key", queueName);
             }
         }
 

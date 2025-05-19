@@ -3,7 +3,7 @@ package vn.ptit.moviebooking.payment.dto.request;
 public class RefundProcessCommand {
 
     private int sagaId;
-    private RefundRequest refundRequest;
+    private String reason;
 
     public int getSagaId() {
         return sagaId;
@@ -13,11 +13,11 @@ public class RefundProcessCommand {
         this.sagaId = sagaId;
     }
 
-    public RefundRequest getRefundRequest() {
-        return refundRequest;
+    public String getReason() {
+        return reason;
     }
 
-    public void setRefundRequest(RefundRequest refundRequest) {
-        this.refundRequest = refundRequest;
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }

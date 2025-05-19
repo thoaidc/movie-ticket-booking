@@ -1,6 +1,5 @@
 package vn.ptit.moviebooking.movie.service.rabbitmq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,22 +21,19 @@ public class SagaConsumer {
 
     private final RabbitMQProducer rabbitMQProducer;
     private final MovieService movieService;
-    private final ObjectMapper objectMapper;
     private static final Logger log = LoggerFactory.getLogger(SagaConsumer.class);
 
-    public SagaConsumer(RabbitMQProducer rabbitMQProducer, MovieService movieService, ObjectMapper objectMapper) {
+    public SagaConsumer(RabbitMQProducer rabbitMQProducer, MovieService movieService) {
         this.rabbitMQProducer = rabbitMQProducer;
         this.movieService = movieService;
-        this.objectMapper = objectMapper;
     }
 
     @RabbitListener(queues = RabbitMQConstants.Queue.MOVIE_VALIDATE_COMMAND)
-    public void handleValidateMovieInfoRequest(String message, Channel channel, Message amqpMessage) {
-        log.debug("[Movie service] - Receive command: {}", message);
+    public void handleValidateMovieInfoRequest(ValidateMovieCommand command, Channel channel, Message amqpMessage) {
+        log.debug("[Movie service] - Receive command: {}", command);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
 
         try {
-            ValidateMovieCommand command = objectMapper.readValue(message, ValidateMovieCommand.class);
             ValidateMovieRequest validateMovieRequest = command.getValidateMovieRequest();
             BaseResponseDTO response = movieService.validateMovieInfo(validateMovieRequest);
 
