@@ -134,9 +134,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.onSearch();
   }
 
-  openBookingModal(showId: number) {
-    this.modalRef = this.modalService.open(BookingModalComponent, {backdrop: 'static', size: 'xl'});
-    this.modalRef.componentInstance.showId = showId;
+  openBookingModal(movie: Movie) {
+    this.modalRef = this.modalService.open(BookingModalComponent, {backdrop: 'static', size: 'lg'});
+    this.modalRef.componentInstance.movie = movie;
     this.modalRef.closed.subscribe(() => this.onReload());
   }
 
