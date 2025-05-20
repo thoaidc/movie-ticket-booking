@@ -12,10 +12,9 @@ import {SafeHtmlPipe} from './shared/pipes/safe-html.pipe';
 import {DatePipe, DecimalPipe, NgClass, NgFor, NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import dayjs from 'dayjs/esm';
-import {UtilsService} from './shared/utils/utils.service';
-import {ToastrService} from 'ngx-toastr';
 import {ICON_RELOAD, ICON_SEARCH} from './shared/utils/icon';
 import {PAGINATION_PAGE_SIZE} from './constants/common.constants';
+import {BookingModalComponent} from './layouts/booking-modal/booking-modal.component';
 
 @Component({
   selector: 'app-root',
@@ -43,22 +42,56 @@ export class AppComponent implements OnInit, OnDestroy {
   private stateSubscription: Subscription | null = null;
   private topicSubscription: Subscription | null = null;
   private modalRef: NgbModalRef | undefined;
-  periods: number = 5;  // This year
+  periods: number = 1;  // Today
   totalItems: number = 0;
-  firmsFilter = {
+  showsFilter = {
     page: 1,
     size: 10,
     keyword: '',
-    fromDate: dayjs().startOf('day'),
+    fromDate: dayjs(),
     toDate: dayjs().endOf('day')
   }
 
   isLoading = false;
+  movies = [
+    {
+      cinema: 'HN',
+      id: 1,
+      title: 'Poster'
+    },
+    {
+      cinema: 'HN',
+      id: 1,
+      title: 'Poster'
+    },
+    {
+      cinema: 'HN',
+      id: 1,
+      title: 'Poster'
+    },
+    {
+      cinema: 'HN',
+      id: 1,
+      title: 'Poster'
+    },
+    {
+      cinema: 'HN',
+      id: 1,
+      title: 'Poster'
+    },
+    {
+      cinema: 'HN',
+      id: 1,
+      title: 'Poster'
+    },
+    {
+      cinema: 'HN',
+      id: 1,
+      title: 'Poster'
+    }
+  ]
 
-  constructor(private websocketService: WebsocketService,
-              protected modalService: NgbModal,
-              protected utilsService: UtilsService,
-              private toast: ToastrService) {}
+  constructor(private websocketService: WebsocketService, private modalService: NgbModal) {}
 
   ngOnInit(): void {
     this.onSearch();
@@ -77,9 +110,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onTimeChange(even: any) {
-    this.firmsFilter.fromDate = even.fromDate;
-    this.firmsFilter.toDate = even.toDate;
-    this.firmsFilter.page = 1;
+    this.showsFilter.fromDate = even.fromDate;
+    this.showsFilter.toDate = even.toDate;
+    this.showsFilter.page = 1;
     this.periods = even.periods;
     this.onSearch();
   }
@@ -89,12 +122,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onReload() {
-    this.periods = 5;
-    this.firmsFilter = {
+    this.periods = 1;
+    this.showsFilter = {
       page: 1,
       size: 10,
       keyword: '',
-      fromDate: dayjs().startOf('day'),
+      fromDate: dayjs(),
       toDate: dayjs().endOf('day')
     }
 
@@ -102,8 +135,14 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   loadMore($event: any) {
-    this.firmsFilter.page = $event;
+    this.showsFilter.page = $event;
     this.onSearch();
+  }
+
+  openBookingModal(showId: number) {
+    this.modalRef = this.modalService.open(BookingModalComponent, {backdrop: 'static', size: 'xl'});
+    this.modalRef.componentInstance.showId = showId;
+    this.modalRef.closed.subscribe(() => this.onReload());
   }
 
   ngOnDestroy(): void {

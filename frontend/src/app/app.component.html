@@ -10,7 +10,7 @@
     <div class="field-search">
       <div class="search-citeria">
         <app-date-filter
-          [class]="periods == 8 ? 'col-9' : 'col-3'"
+          [class]="'col-3'"
           (timeChange)="onTimeChange($event)"
           [periods]="periods"
           [clearable]="false"
@@ -22,7 +22,7 @@
           <div class="input-text-custom">
             <input
               class="form-control"
-              [(ngModel)]="firmsFilter.keyword"
+              [(ngModel)]="showsFilter.keyword"
               type="search"
               (keyup.enter)="onSearch()"
               placeholder="Tên phim, tác giả,..."
@@ -42,8 +42,18 @@
       </div>
     </div>
 
-    <div class="firms-contents my-4">
-
+    <div class="firms-contents my-5">
+      <div class="d-flex flex-wrap gap-3">
+        <ng-container *ngFor="let movie of movies">
+          <div class="card firm" (click)="openBookingModal(movie.id)">
+            <img src="./assets/images/movie.jpg" class="card-img-top" alt="poster"/>
+            <div class="card-body p-2">
+              <h6 class="card-title mb-1 text-truncate">{{ movie.title }}</h6>
+              <p class="card-text mb-0 text-muted small">{{ movie.cinema }}</p>
+            </div>
+          </div>
+        </ng-container>
+      </div>
     </div>
 
     <div class="from-pagination">
@@ -51,7 +61,7 @@
         <span class="label-total">Tổng: {{ totalItems | number }}</span>
         <ng-select
           [items]="PAGINATION_PAGE_SIZE"
-          [(ngModel)]="firmsFilter.size"
+          [(ngModel)]="showsFilter.size"
           (ngModelChange)="onSearch()"
         >
         </ng-select>
@@ -59,8 +69,8 @@
       <ngb-pagination
         class="pagination"
         [collectionSize]="totalItems"
-        [pageSize]="firmsFilter.size"
-        [page]="firmsFilter.page"
+        [pageSize]="showsFilter.size"
+        [page]="showsFilter.page"
         [directionLinks]="true"
         [maxSize]="5"
         (pageChange)="loadMore($event)"
