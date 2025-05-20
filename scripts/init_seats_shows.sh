@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 echo "Waiting for services and gateway to be healthy..."
 sleep 30  # Wait 30s for the services to start
@@ -6,7 +6,8 @@ sleep 30  # Wait 30s for the services to start
 MAX_RETRIES=10
 RETRY_INTERVAL=10
 
-for i in $(seq 1 $MAX_RETRIES); do
+i=1
+while [ $i -le $MAX_RETRIES ]; do
   echo "Attempt $i of $MAX_RETRIES..."
 
   # Call API and get only HTTP status code
@@ -19,6 +20,8 @@ for i in $(seq 1 $MAX_RETRIES); do
     echo "Failed on attempt $i (HTTP $status). Retrying in $RETRY_INTERVAL s..."
     sleep $RETRY_INTERVAL
   fi
+
+  i=$((i + 1))
 done
 
 # If you run the whole round and still fail
