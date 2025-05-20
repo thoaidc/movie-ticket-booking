@@ -33,8 +33,9 @@ public class SagaConsumer {
 
     @RabbitListener(queues = RabbitMQConstants.Queue.NOTIFICATION_COMMAND)
     public void handleNotificationRequest(NotificationProcessCommand command, Channel channel, Message amqpMessage) {
-        log.info("Received message from RabbitMQ: {}", command);
+        log.info("[BOOKING] - Notification confirm to customer: {}", command);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
+        replyMessage.setSagaId(command.getSagaId());
 
         try {
             NotificationRequest notificationRequest = command.getNotificationRequest();
@@ -43,7 +44,7 @@ public class SagaConsumer {
             boolean isSentSuccess = Objects.equals(NotificationConstants.NotificationStatus.SUCCESS, notification.getStatus());
             replyMessage.setStatus(isSentSuccess);
             replyMessage.setResult(notification);
-            replyMessage.setSagaId(command.getSagaId());
+            log.info("[BOOKING] - Sent notification status: {}", isSentSuccess);
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {

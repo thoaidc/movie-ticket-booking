@@ -10,7 +10,7 @@
   <p class="mb-1"><span class="text-dark fw-medium fs-6">Thời lượng: </span>{{ movie.duration }} phút</p>
   <p class="mb-1"><span class="text-dark fw-medium fs-6">Mô tả: </span>{{ movie.description }}</p>
 
-  <div class="my-5 d-flex justify-content-between align-items-start">
+  <div class="my-4 d-flex justify-content-between align-items-start">
     <div style="width: 220px">
       <h5 class="fw-medium fs-5 mb-2">Suất chiếu</h5>
 
@@ -22,6 +22,7 @@
         [(ngModel)]="selectedShowId"
         [clearable]="false"
         (change)="changeShows()"
+        [disabled]="step === 'COMPLETED'"
       >
       </ng-select>
 
@@ -51,7 +52,7 @@
   </div>
 
   <ng-container *ngIf="step !== 'INIT'">
-    <div class="booking-status mb-5">
+    <div class="booking-status">
       <h5>Trạng thái đơn hàng</h5>
 
       <div class="booking-flow">

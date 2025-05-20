@@ -36,8 +36,9 @@ public class SagaConsumer {
 
     @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_PROCESS_COMMAND)
     public void handlePaymentProcessRequest(PaymentProcessCommand command, Channel channel, Message amqpMessage) {
-        log.info("Received message from RabbitMQ: {}", command);
+        log.info("[BOOKING] - Payment process: {}", command);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
+        replyMessage.setSagaId(command.getSagaId());
 
         try {
             PaymentRequest paymentRequest = command.getPaymentRequest();
@@ -47,7 +48,7 @@ public class SagaConsumer {
             boolean isPaymentSuccess = Objects.equals(PaymentConstants.PaymentStatus.COMPLETED, payment.getStatus());
             replyMessage.setStatus(isPaymentSuccess);
             replyMessage.setResult(payment);
-            replyMessage.setSagaId(command.getSagaId());
+            log.info("[BOOKING] - Payment process status: {}", isPaymentSuccess);
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {
@@ -59,14 +60,14 @@ public class SagaConsumer {
 
     @RabbitListener(queues = RabbitMQConstants.Queue.PAYMENT_REFUND_COMMAND)
     public void handleRefundRequest(RefundProcessCommand command, Channel channel, Message amqpMessage) {
-        log.info("Received message from RabbitMQ: {}", command);
+        log.info("[BOOKING] - Refund process: {}", command);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
+        replyMessage.setSagaId(command.getSagaId());
 
         try {
             Refund refund = paymentService.refund(command);
             replyMessage.setStatus(true);
             replyMessage.setResult(refund);
-            replyMessage.setSagaId(command.getSagaId());
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {

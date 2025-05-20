@@ -27,9 +27,7 @@ public class NotificationService {
         notification.setContent(notificationRequest.getContent());
         notification.setStatus(NotificationConstants.NotificationStatus.PROCESSING);
         notification.setSentAt(Instant.now());
-        notificationRepository.save(notification);
-
-        return sendNotificationToClient(notification);
+        return sendNotificationToClient(notificationRepository.save(notification));
     }
 
     @Transactional

@@ -38,7 +38,6 @@ public class CustomerService {
         customer.setFullname(request.getFullname());
         customer.setEmail(request.getEmail());
         customer.setPhone(request.getPhone());
-        customerRepository.save(customer);
-        return customer;
+        return customerRepository.save(customer);
     }
 }

@@ -33,16 +33,17 @@ public class SagaConsumer {
 
     @RabbitListener(queues = RabbitMQConstants.Queue.VERIFY_CUSTOMER_COMMAND)
     public void handleVerifyCustomerRequest(VerifyCustomerRequestCommand command, Channel channel, Message amqpMessage) {
-        log.info("Received message from RabbitMQ: {}", command);
+        log.info("[BOOKING] - Verify customer info");
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
+        replyMessage.setSagaId(command.getSagaId());
 
         try {
             VerifyCustomerRequest saveCustomerRequest = command.getVerifyCustomerRequest();
             Customer customer = customerService.saveCustomerInfo(saveCustomerRequest);
 
-            replyMessage.setSagaId(command.getSagaId());
             replyMessage.setStatus(Objects.nonNull(customer) && customer.getId() > 0);
             replyMessage.setResult(customer.getId());
+            log.info("[BOOKING] - Verify customer status: {} - ID: {}", replyMessage.getStatus(), customer.getId());
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {

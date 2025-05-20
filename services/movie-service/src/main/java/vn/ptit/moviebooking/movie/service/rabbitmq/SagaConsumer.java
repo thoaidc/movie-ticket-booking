@@ -30,15 +30,15 @@ public class SagaConsumer {
 
     @RabbitListener(queues = RabbitMQConstants.Queue.MOVIE_VALIDATE_COMMAND)
     public void handleValidateMovieInfoRequest(ValidateMovieCommand command, Channel channel, Message amqpMessage) {
-        log.debug("[Movie service] - Receive command: {}", command);
+        log.info("[BOOKING] - Validate movie info: {}", command);
         BaseCommandReplyMessage replyMessage = new BaseCommandReplyMessage();
+        replyMessage.setSagaId(command.getSagaId());
 
         try {
             ValidateMovieRequest validateMovieRequest = command.getValidateMovieRequest();
             BaseResponseDTO response = movieService.validateMovieInfo(validateMovieRequest);
-
-            replyMessage.setSagaId(command.getSagaId());
             replyMessage.setStatus(response.getStatus());
+            log.info("[BOOKING] - Validate movie status: {}", replyMessage.getStatus());
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
         } catch (Exception e) {

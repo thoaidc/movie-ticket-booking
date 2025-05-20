@@ -17,7 +17,6 @@ public interface ShowRepository extends JpaRepository<Show, Integer> {
             SELECT s.id,
                 s.movie_id as movieId,
                 s.cinema_room_id as roomId,
-                s.status,
                 s.ticket_price as ticketPrice,
                 s.start_time as startTime,
                 s.end_time as endTime,

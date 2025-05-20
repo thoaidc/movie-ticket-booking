@@ -72,7 +72,7 @@ export class BookingModalComponent implements OnInit, OnDestroy {
   }
 
   toggleSeatSelection(seat: SeatShow) {
-    if (seat.status !== SeatStatus.AVAILABLE)
+    if (seat.status !== SeatStatus.AVAILABLE || this.step === 'COMPLETED')
       return;
 
     const index = this.selectedSeats.indexOf(seat.id);
@@ -103,6 +103,7 @@ export class BookingModalComponent implements OnInit, OnDestroy {
 
   changeShows() {
     this.selectedShowInfo = this.movieShows.find(s => s.id === this.selectedShowId);
+    this.selectedSeats = [];
 
     this.seatService.getSeatsShowByShowId(this.selectedShowId).subscribe(response => {
       this.seatsShow = response.result || [];
