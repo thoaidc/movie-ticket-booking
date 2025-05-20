@@ -12,7 +12,7 @@ public interface SeatRepository extends JpaRepository<Seat, Integer> {
 
     @Query(
         value = """
-            SELECT * FROM hdv_movie.seat s
+            SELECT s.* FROM hdv_movie.seat s
             JOIN hdv_movie.show_time sh ON s.cinema_room_id = sh.cinema_room_id
             WHERE sh.id = ?1
         """,

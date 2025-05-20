@@ -70,6 +70,10 @@ public class MovieService {
         return BaseResponseDTO.builder().ok(showRepository.findAllByMovieId(movieId));
     }
 
+    public BaseResponseDTO getAllSeatsByShowId(Integer showId) {
+        return BaseResponseDTO.builder().ok(seatRepository.findAllByShowId(showId));
+    }
+
     public BaseResponseDTO getAllSeatsGroupedByShow() {
         List<Show> shows = showRepository.findAll();
 

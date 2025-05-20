@@ -1,14 +1,14 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {Location, NgClass, NgFor, NgIf} from '@angular/common';
-import {Seat} from '../../core/models/seats.model';
+import {Seat, SeatShow, SeatStatus} from '../../core/models/seats.model';
 import {Movie} from '../../core/models/movies.model';
-import {LIST_TIME_SELECT} from '../../constants/common.constants';
 import {NgSelectComponent} from '@ng-select/ng-select';
 import {Shows} from '../../core/models/shows.model';
 import {FormsModule} from '@angular/forms';
 import {ShowsService} from '../../core/services/shows.service';
 import {BaseFilterRequest} from '../../core/models/request.model';
+import {SeatService} from '../../core/services/seats.service';
 
 @Component({
   selector: 'app-booking-modal',
@@ -27,12 +27,17 @@ export class BookingModalComponent implements OnInit {
   @Input() movie!: Movie;
   movieShows: Shows[] = [];
   selectedShowId: number = 0;
+  selectedShowInfo: Shows | undefined;
   selectedSeats: number[] = [];
+  seats: Seat[] = [];
+  seatsShow: SeatShow[] = [];
 
   constructor(
     public activeModal: NgbActiveModal,
     private location: Location,
-    private showService: ShowsService
+    private showService: ShowsService,
+    private seatService: SeatService,
+    private cdr: ChangeDetectorRef
   ) {
     this.location.subscribe(() => {
       this.activeModal.dismiss(false);
@@ -45,30 +50,8 @@ export class BookingModalComponent implements OnInit {
     }
   }
 
-  seats: Seat[] = [
-    { id: 1, seat_number: 1, seat_row: 1, code: 'A1', status: 'ACTIVE' },
-    { id: 2, seat_number: 2, seat_row: 1, code: 'A2', status: 'MAINTENANCE' },
-    { id: 3, seat_number: 3, seat_row: 1, code: 'A3', status: 'ACTIVE' },
-    { id: 4, seat_number: 4, seat_row: 1, code: 'A4', status: 'ACTIVE' },
-    { id: 5, seat_number: 5, seat_row: 1, code: 'A5', status: 'ACTIVE' },
-    { id: 6, seat_number: 1, seat_row: 2, code: 'B1', status: 'ACTIVE' },
-    { id: 7, seat_number: 2, seat_row: 2, code: 'B2', status: 'ACTIVE' },
-    { id: 8, seat_number: 3, seat_row: 2, code: 'B3', status: 'ACTIVE' },
-    { id: 9, seat_number: 4, seat_row: 2, code: 'B4', status: 'ACTIVE' },
-    { id: 10, seat_number: 5, seat_row: 2, code: 'B5', status: 'ACTIVE' },
-    { id: 11, seat_number: 1, seat_row: 3, code: 'C1', status: 'ACTIVE' },
-    { id: 12, seat_number: 2, seat_row: 3, code: 'C2', status: 'ACTIVE' },
-    { id: 13, seat_number: 3, seat_row: 3, code: 'C3', status: 'ACTIVE' },
-    { id: 14, seat_number: 4, seat_row: 3, code: 'C4', status: 'ACTIVE' },
-    { id: 15, seat_number: 5, seat_row: 3, code: 'C5', status: 'ACTIVE' },
-    { id: 16, seat_number: 1, seat_row: 4, code: 'D1', status: 'ACTIVE' },
-    { id: 17, seat_number: 2, seat_row: 4, code: 'D2', status: 'ACTIVE' },
-    { id: 18, seat_number: 3, seat_row: 4, code: 'D3', status: 'BOOKED' },
-    // ...
-  ];
-
-  toggleSeatSelection(seat: Seat) {
-    if (seat.status !== 'ACTIVE')
+  toggleSeatSelection(seat: SeatShow) {
+    if (seat.status !== SeatStatus.AVAILABLE)
       return;
 
     const index = this.selectedSeats.indexOf(seat.id);
@@ -78,8 +61,6 @@ export class BookingModalComponent implements OnInit {
     } else {
       this.selectedSeats.push(seat.id);
     }
-
-    console.log(this.selectedSeats)
   }
 
   isSelected(seatId: number): boolean {
@@ -95,30 +76,51 @@ export class BookingModalComponent implements OnInit {
     this.showService.getShowsByMovieId(this.movie.id, searchRequest).subscribe(response => {
       this.movieShows = response.result || [];
       this.selectedShowId = this.movieShows[0].id;
+      this.changeShows();
     })
   }
 
   changeShows() {
+    this.selectedShowInfo = this.movieShows.find(s => s.id === this.selectedShowId);
 
+    this.seatService.getSeatsShowByShowId(this.selectedShowId).subscribe(response => {
+      this.seatsShow = response.result || [];
+
+      this.seatService.getSeatsByShowId(this.selectedShowId).subscribe(response => {
+        this.seats = response.result || [];
+
+        this.seatsShow = this.seatsShow.map(seatShow => {
+          const seat = this.seats.find(s => s.id === seatShow.seatId);
+
+          return {
+            ...seatShow,
+            seatNumber: seat?.seatNumber,
+            seatRow: seat?.seatRow,
+            code: seat?.code
+          };
+        });
+
+        this.cdr.detectChanges();
+      });
+    });
   }
 
   get rows(): number[] {
-    return [...new Set(this.seats.map(s => s.seat_row))].sort();
+    return [...new Set(this.seatsShow.map(s => s.seatRow || 0))].sort();
   }
 
-  get seatsByRow(): { [key: number]: Seat[] } {
-    const map: { [key: number]: Seat[] } = {};
+  get seatsByRow(): { [key: number]: SeatShow[] } {
+    const map: { [key: number]: SeatShow[] } = {};
+
     for (let row of this.rows) {
-      map[row] = this.seats
-        .filter(s => s.seat_row === row)
-        .sort((a, b) => a.seat_number - b.seat_number);
+      map[row] = this.seatsShow.filter(s => s.seatRow === row)
+        .sort((a, b) => ((a.seatNumber || 0) - (b.seatNumber || 0)));
     }
+
     return map;
   }
 
   dismiss() {
     this.activeModal.dismiss(false);
   }
-
-  protected readonly LIST_TIME_SELECT = LIST_TIME_SELECT;
 }

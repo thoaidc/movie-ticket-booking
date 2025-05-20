@@ -17,4 +17,6 @@ public interface SeatShowRepository extends JpaRepository<SeatShow, Integer> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM SeatShow s WHERE s.id IN :ids AND s.status = :status")
     List<SeatShow> findAllByIdInAndStatusForUpdate(@Param("ids") Collection<Integer> ids, @Param("status") String status);
+
+    List<SeatShow> findAllByShowId(Integer showId);
 }

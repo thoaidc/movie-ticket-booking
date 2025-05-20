@@ -12,7 +12,6 @@ public interface ShowDTO {
     String getMovie();
     String getRoom();
     Float getTicketPrice();
-    String getStatus();
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm", timezone = "UTC")
     Instant getStartTime();

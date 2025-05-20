@@ -59,6 +59,10 @@ public class CheckSeatAvailabilityService {
         return ResponseEntity.ok().build();
     }
 
+    public BaseResponseDTO getAllSeatsOfShow(Integer showId) {
+        return BaseResponseDTO.builder().ok(seatShowRepository.findAllByShowId(showId));
+    }
+
     @Transactional
     public BaseResponseDTO checkSeatsAvailability(SeatsCommand command) {
         List<SeatShow> seatShows = seatShowRepository

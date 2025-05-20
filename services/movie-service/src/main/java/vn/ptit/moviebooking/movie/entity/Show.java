@@ -33,9 +33,6 @@ public class Show {
     @Column(name = "ticket_price", nullable = false)
     private Float ticketPrice;
 
-    @Column(name = "status", nullable = false)
-    private String status;
-
     @Column(name = "start_time", nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm", timezone = "UTC")
     private Instant startTime;
@@ -74,14 +71,6 @@ public class Show {
 
     public void setTicketPrice(Float ticketPrice) {
         this.ticketPrice = ticketPrice;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public Instant getStartTime() {
