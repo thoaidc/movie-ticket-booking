@@ -22,9 +22,4 @@ public class CinemaResource {
     public BaseResponseDTO getAllCinemas() {
         return movieService.getAllCinemas();
     }
-
-    @GetMapping("/rooms/{cinemaId}")
-    public BaseResponseDTO getAllCinemaRooms(@PathVariable Integer cinemaId) {
-        return movieService.getAllCinemaRooms(cinemaId);
-    }
 }

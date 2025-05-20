@@ -1,6 +1,8 @@
 package vn.ptit.moviebooking.seatavailability.resource;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,5 +22,10 @@ public class SeatShowResource {
     @PostMapping("/init")
     public ResponseEntity<?> initSeatsOfShows() {
         return checkSeatAvailabilityService.initSeatsOfShow();
+    }
+
+    @GetMapping("/by-show/{showId}")
+    public BaseResponseDTO getAllSeatsOfShow(@PathVariable Integer showId) {
+        return checkSeatAvailabilityService.getAllSeatsOfShow(showId);
     }
 }

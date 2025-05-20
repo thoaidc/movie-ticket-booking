@@ -33,9 +33,6 @@ public class Seat {
     @Column(name = "code", length = 10, nullable = false)
     private String code;
 
-    @Column(name = "status", nullable = false)
-    private String status;
-
     public Integer getId() {
         return id;
     }
@@ -74,13 +71,5 @@ public class Seat {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

@@ -1,0 +1,52 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="verifyCustomerInfo">Nhập thông tin liên hệ</h5>
+  <button type="button" class="btn-close" aria-label="Close" (click)="dismiss()"></button>
+</div>
+
+<div class="modal-body">
+  <div class="item-search w-100">
+    <label for="fullname">Họ và tên</label>
+    <div class="input-text-custom">
+      <input
+        id="fullname"
+        type="text"
+        class="form-control"
+        [(ngModel)]="customer.fullname"
+        placeholder="Họ và tên"
+      />
+    </div>
+  </div>
+
+  <div class="item-search w-100">
+    <label for="email">Email</label>
+    <div class="input-text-custom">
+      <input
+        id="email"
+        type="email"
+        class="form-control"
+        [(ngModel)]="customer.email"
+        placeholder="Email"
+      />
+    </div>
+  </div>
+
+  <div class="item-search w-100">
+    <label for="phone">Số điện thoại</label>
+    <div class="input-text-custom">
+      <input
+        id="phone"
+        type="text"
+        class="form-control"
+        [(ngModel)]="customer.phone"
+        alphanumericOnly
+        placeholder="Số điện thoại"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer py-3">
+  <div class="btn-row col-md-12 d-flex justify-content-end m-0">
+    <button type="button" class="save-button-dialog me-2 mb-1" [disabled]="bookingId === 0" (click)="confirm()">Xác nhận</button>
+  </div>
+</div>

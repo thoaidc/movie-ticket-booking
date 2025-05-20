@@ -22,21 +22,6 @@ export class UtilsService {
     return date.isValid() ? date.format(toFormat) : '';
   }
 
-  getFromToMoment(date?: dayjs.Dayjs, isMaxDate?: boolean): any {
-    if (date && Object.keys(date).length !== 0) {
-      const date1 = dayjs(date);
-
-      return {
-        year: date1.year(),
-        month: date1.month() + 1,
-        day: date1.date(),
-      };
-    }
-
-    const _date = isMaxDate ? null : dayjs();
-    return _date ? { year: _date.year(), month: _date.month() + 1, day: _date.date() } : null;
-  }
-
   getCurrentDate() {
     const _date = dayjs();
     return { year: _date.year(), month: _date.month() + 1, day: _date.date() };

@@ -33,10 +33,12 @@
             ],
             "styles": [
               "src/assets/scss/styles.scss",
+              "src/assets/scss/app.min.scss",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": [
+              "src/assets/js/app.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ]
           },

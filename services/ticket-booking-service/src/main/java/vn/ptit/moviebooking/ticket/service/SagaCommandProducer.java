@@ -43,11 +43,17 @@ public class SagaCommandProducer {
         this.notificationService = notificationService;
     }
 
+    interface BookingStep {
+        String VERIFY_CUSTOMER = "VERIFY_CUSTOMER";
+        String PAYMENT = "PAYMENT";
+        String COMPLETED = "COMPLETED";
+    }
+
     public BaseResponseDTO createBookingSagaOrchestrator(BookingRequest bookingRequest) {
         // Create booking with PENDING status
         ValidateMovieRequestCommand command = ticketBookingService.createValidateMovieCommand(bookingRequest);
         rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.MOVIE_VALIDATE_COMMAND, command);
-        log.debug("[BOOKING] - Create booking with status PENDING and sagaId: {}", command.getSagaId());
+        log.info("[BOOKING] - Create booking with status PENDING and sagaId: {}", command.getSagaId());
         return BaseResponseDTO.builder().message("Create booking request successfully!").ok(command.getSagaId());
     }
 
@@ -58,21 +64,22 @@ public class SagaCommandProducer {
                 .success(false)
                 .message("Invalid movie information! Cancel booking...")
                 .build();
+        log.info("[BOOKING] - Verify movie replied");
 
         try {
             // Movie validate successfully -> Check availability seats + Hold seats to payment
             if (replyMessage.isSuccess()) {
+                log.info("[BOOKING] - Movie information verified successfully");
                 CheckSeatAvailabilityRequestCommand command =
                         ticketBookingService.createCheckSeatsAvailabilityCommand(replyMessage);
 
-                response = BaseResponseDTO.builder().message("Movie verified successfully!").ok();
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.MOVIE_VERIFIED);
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.CHECK_SEATS_AVAILABILITY_COMMAND, command);
-                log.debug("[BOOKING] - Movie information verified successfully");
+                response = BaseResponseDTO.builder().message("Movie verified successfully!").ok();
             } else {
                 // Movie validate failed -> Cancel booking
+                log.info("[BOOKING] - Movie information verified failed! Cancel booking.");
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
-                log.debug("[BOOKING] - Movie information verified failed! Cancel booking.");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -90,18 +97,20 @@ public class SagaCommandProducer {
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
                 .message("Seat held failed! Cancel booking...")
+                .result(BookingStep.VERIFY_CUSTOMER)
                 .build();
+        log.info("[BOOKING] - Check seats availability replied");
 
         try {
             // Seats availability + Held seats successfully -> Verify customer + Save customer info
             if (replyMessage.isSuccess()) {
-                response = BaseResponseDTO.builder().message("Seats held successfully!").ok();
+                log.info("[BOOKING] - Seats availability! Seats held successfully!");
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.SEAT_RESERVED);
-                log.debug("[BOOKING] - Seats availability! Seats held successfully!");
+                response = BaseResponseDTO.builder().message("Seats held successfully!").ok(BookingStep.VERIFY_CUSTOMER);
             } else {
                 // Seats unavailability / Held seats failed -> Cancel booking
+                log.info("[BOOKING] - Seats unavailability or held failed! Cancel booking.");
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
-                log.debug("[BOOKING] - Seats unavailability or held failed! Cancel booking.");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -127,21 +136,23 @@ public class SagaCommandProducer {
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
                 .message("Your information verified failed! Cancel booking...")
+                .result(BookingStep.PAYMENT)
                 .build();
+        log.info("[BOOKING] - Verify customer info replied");
 
         try {
             // Customer verified successfully -> Payment process
             if (replyMessage.isSuccess()) {
-                response = BaseResponseDTO.builder().message("Your information verified successfully!").ok();
+                log.info("[BOOKING] - Customer information verified successfully!");
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.CUSTOMER_VERIFIED);
                 ticketBookingService.updateBookingCustomerInfo(replyMessage);
-                log.debug("[BOOKING] - Customer information verified successfully!");
+                response = BaseResponseDTO.builder().message("Your information verified successfully!").ok(BookingStep.PAYMENT);
             } else {
                 // Verified failed -> Reserve held booking seats + Cancel booking
-                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
+                log.info("[BOOKING] - Customer information verified failed! Cancel booking.");
                 ReleasedSeatsRequestCommand command = ticketBookingService.createReleasedBookingSeatsCommand(replyMessage);
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.RELEASED_SEATS_COMMAND, command);
-                log.debug("[BOOKING] - Customer information verified failed! Cancel booking.");
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -168,21 +179,22 @@ public class SagaCommandProducer {
                 .success(false)
                 .message("Payment failed! Cancel booking...")
                 .build();
+        log.info("[BOOKING] - Payment process replied");
 
         try {
             // Payment successfully -> Confirm booking seats
             if (replyMessage.isSuccess()) {
-                response = BaseResponseDTO.builder().message("Payment successfully!").ok();
+                log.info("[BOOKING] - Payment successfully!");
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.PAID);
                 ConfirmSeatsRequestCommand command = ticketBookingService.createConfirmBookingSeatsCommand(replyMessage);
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.CONFIRM_SEATS_COMMAND, command);
-                log.debug("[BOOKING] - Payment successfully!");
+                response = BaseResponseDTO.builder().message("Payment successfully!").ok();
             } else {
                 // Payment failed -> Reserve held booking seats + Cancel booking
-                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
+                log.info("[BOOKING] - Payment failed! Cancel booking.");
                 ReleasedSeatsRequestCommand command = ticketBookingService.createReleasedBookingSeatsCommand(replyMessage);
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.RELEASED_SEATS_COMMAND, command);
-                log.debug("[BOOKING] - Payment failed! Cancel booking.");
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -200,24 +212,26 @@ public class SagaCommandProducer {
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
                 .message("Confirmation of booked seat failed! Cancel booking...")
+                .result(BookingStep.COMPLETED)
                 .build();
+        log.info("[BOOKING] - Confirm booked seats replied");
 
         try {
             // Booked seats successfully -> Confirm order completed
             if (replyMessage.isSuccess()) {
-                response = BaseResponseDTO.builder().message("Booking successfully!").ok();
+                log.info("[BOOKING] - Confirm booked seats! Booking completed.");
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.COMPLETED);
-                log.debug("[BOOKING] - Confirm booked seats! Booking completed.");
+                response = BaseResponseDTO.builder().message("Booking completed successfully!").ok(BookingStep.COMPLETED);
             } else {
                 // Booked seats failed -> Refund to customer + Reserve held booking seats + Cancel booking
-                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
+                log.info("[BOOKING] - Confirm booked seats failed! Cancel booking.");
                 ReleasedSeatsRequestCommand command = ticketBookingService.createReleasedBookingSeatsCommand(replyMessage);
                 RefundRequestCommand refundCommand = new RefundRequestCommand();
                 refundCommand.setSagaId(replyMessage.getSagaId());
                 refundCommand.setReason("Confirmation of booked seat failed!");
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.RELEASED_SEATS_COMMAND, command);
                 rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.PAYMENT_REFUND_COMMAND, refundCommand);
-                log.debug("[BOOKING] - Confirm booked seats failed! Cancel booking.");
+                ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.FAILED);
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -237,13 +251,14 @@ public class SagaCommandProducer {
                 .success(false)
                 .message("Could not reserve booked seats!")
                 .build();
+        log.info("[BOOKING] - Reserved seats replied");
 
         try {
             if (replyMessage.isSuccess()) {
+                log.info("[BOOKING] - Reserve booked seats successfully!");
                 response = BaseResponseDTO.builder().message("Reserve booked seats successfully!").ok();
-                log.debug("[BOOKING] - Reserve booked seats successfully!");
             } else {
-                log.debug("[BOOKING] - Reserve booked seats failed!");
+                log.info("[BOOKING] - Reserve booked seats failed!");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);
@@ -263,13 +278,14 @@ public class SagaCommandProducer {
                 .success(false)
                 .message("Refund to customer failed!")
                 .build();
+        log.info("[BOOKING] - Refund process replied");
 
         try {
             if (replyMessage.isSuccess()) {
+                log.info("[BOOKING] - Refund to customer successfully!");
                 response = BaseResponseDTO.builder().message("Refund to customer successfully!").ok();
-                log.debug("[BOOKING] - Refund to customer successfully!");
             } else {
-                log.debug("[BOOKING] - Refund to customer failed!");
+                log.info("[BOOKING] - Refund to customer failed!");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);

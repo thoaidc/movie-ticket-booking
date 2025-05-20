@@ -11,7 +11,6 @@ import vn.ptit.moviebooking.movie.dto.response.ShowSeatResponse;
 import vn.ptit.moviebooking.movie.entity.Movie;
 import vn.ptit.moviebooking.movie.entity.Show;
 import vn.ptit.moviebooking.movie.repository.CinemaRepository;
-import vn.ptit.moviebooking.movie.repository.CinemaRoomRepository;
 import vn.ptit.moviebooking.movie.repository.MovieRepository;
 import vn.ptit.moviebooking.movie.repository.SeatRepository;
 import vn.ptit.moviebooking.movie.repository.ShowRepository;
@@ -25,18 +24,15 @@ public class MovieService {
 
     private final MovieRepository movieRepository;
     private final CinemaRepository cinemaRepository;
-    private final CinemaRoomRepository cinemaRoomRepository;
     private final ShowRepository showRepository;
     private final SeatRepository seatRepository;
 
     public MovieService(MovieRepository movieRepository,
                         CinemaRepository cinemaRepository,
-                        CinemaRoomRepository cinemaRoomRepository,
                         ShowRepository showRepository,
                         SeatRepository seatRepository) {
         this.movieRepository = movieRepository;
         this.cinemaRepository = cinemaRepository;
-        this.cinemaRoomRepository = cinemaRoomRepository;
         this.showRepository = showRepository;
         this.seatRepository = seatRepository;
     }
@@ -68,10 +64,6 @@ public class MovieService {
 
     public BaseResponseDTO getAllCinemas() {
         return BaseResponseDTO.builder().ok(cinemaRepository.findAll());
-    }
-
-    public BaseResponseDTO getAllCinemaRooms(Integer cinemaId) {
-        return BaseResponseDTO.builder().ok(cinemaRoomRepository.findAllByCinemaId(cinemaId));
     }
 
     public BaseResponseDTO getAllShowsByMovieId(Integer movieId) {

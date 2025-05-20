@@ -18,13 +18,13 @@ public class SeatResource {
         this.movieService = movieService;
     }
 
-    @GetMapping("/by-show/{showId}")
-    public BaseResponseDTO getAllSeatsByShowId(@PathVariable Integer showId) {
-        return movieService.getAllSeatsByShowId(showId);
-    }
-
     @GetMapping("/by-all-shows")
     public BaseResponseDTO getAllSeatsGroupedByShow() {
         return movieService.getAllSeatsGroupedByShow();
+    }
+
+    @GetMapping("/by-show/{showId}")
+    public BaseResponseDTO getAllSeatsByShowId(@PathVariable Integer showId) {
+        return movieService.getAllSeatsByShowId(showId);
     }
 }
