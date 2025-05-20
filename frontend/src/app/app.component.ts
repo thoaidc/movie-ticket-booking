@@ -15,6 +15,10 @@ import dayjs from 'dayjs/esm';
 import {ICON_RELOAD, ICON_SEARCH} from './shared/utils/icon';
 import {PAGINATION_PAGE_SIZE} from './constants/common.constants';
 import {BookingModalComponent} from './layouts/booking-modal/booking-modal.component';
+import {BaseFilterRequest} from './core/models/request.model';
+import {Movie} from './core/models/movies.model';
+import {MovieService} from './core/services/movie.service';
+import {UtilsService} from './shared/utils/utils.service';
 
 @Component({
   selector: 'app-root',
@@ -44,7 +48,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private modalRef: NgbModalRef | undefined;
   periods: number = 1;  // Today
   totalItems: number = 0;
-  showsFilter = {
+  moviesFilter = {
     page: 1,
     size: 10,
     keyword: '',
@@ -53,45 +57,14 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   isLoading = false;
-  movies = [
-    {
-      cinema: 'HN',
-      id: 1,
-      title: 'Poster'
-    },
-    {
-      cinema: 'HN',
-      id: 1,
-      title: 'Poster'
-    },
-    {
-      cinema: 'HN',
-      id: 1,
-      title: 'Poster'
-    },
-    {
-      cinema: 'HN',
-      id: 1,
-      title: 'Poster'
-    },
-    {
-      cinema: 'HN',
-      id: 1,
-      title: 'Poster'
-    },
-    {
-      cinema: 'HN',
-      id: 1,
-      title: 'Poster'
-    },
-    {
-      cinema: 'HN',
-      id: 1,
-      title: 'Poster'
-    }
-  ]
+  movies: Movie[] = [];
 
-  constructor(private websocketService: WebsocketService, private modalService: NgbModal) {}
+  constructor(
+    private websocketService: WebsocketService,
+    private modalService: NgbModal,
+    private movieService: MovieService,
+    private utilsService: UtilsService
+  ) {}
 
   ngOnInit(): void {
     this.onSearch();
@@ -110,20 +83,42 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onTimeChange(even: any) {
-    this.showsFilter.fromDate = even.fromDate;
-    this.showsFilter.toDate = even.toDate;
-    this.showsFilter.page = 1;
+    this.moviesFilter.fromDate = even.fromDate;
+    this.moviesFilter.toDate = even.toDate;
+    this.moviesFilter.page = 1;
     this.periods = even.periods;
     this.onSearch();
   }
 
   onSearch() {
+    const searchRequest: BaseFilterRequest = {
+      page: this.moviesFilter.page - 1,
+      size: this.moviesFilter.size
+    }
 
+    if (this.moviesFilter.keyword && this.moviesFilter.keyword !== '') {
+      searchRequest.keyword = this.moviesFilter.keyword;
+    }
+
+    if (this.moviesFilter.fromDate) {
+      const fromDate = this.moviesFilter.fromDate.toString();
+      searchRequest.fromDate = this.utilsService.convertToDateString(fromDate, 'YYYY-MM-DD HH:mm:ss');
+    }
+
+    if (this.moviesFilter.toDate) {
+      const toDate = this.moviesFilter.toDate.toString();
+      searchRequest.toDate = this.utilsService.convertToDateString(toDate, 'YYYY-MM-DD HH:mm:ss');
+    }
+
+    this.movieService.getMoviesWithPaging(searchRequest).subscribe(response => {
+      this.movies = response.result || [];
+      this.totalItems = response.total || 0;
+    });
   }
 
   onReload() {
     this.periods = 1;
-    this.showsFilter = {
+    this.moviesFilter = {
       page: 1,
       size: 10,
       keyword: '',
@@ -135,7 +130,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   loadMore($event: any) {
-    this.showsFilter.page = $event;
+    this.moviesFilter.page = $event;
     this.onSearch();
   }
 

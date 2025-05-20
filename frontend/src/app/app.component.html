@@ -22,7 +22,7 @@
           <div class="input-text-custom">
             <input
               class="form-control"
-              [(ngModel)]="showsFilter.keyword"
+              [(ngModel)]="moviesFilter.keyword"
               type="search"
               (keyup.enter)="onSearch()"
               placeholder="Tên phim, tác giả,..."
@@ -48,8 +48,8 @@
           <div class="card firm" (click)="openBookingModal(movie.id)">
             <img src="./assets/images/movie.jpg" class="card-img-top" alt="poster"/>
             <div class="card-body p-2">
-              <h6 class="card-title mb-1 text-truncate">{{ movie.title }}</h6>
-              <p class="card-text mb-0 text-muted small">{{ movie.cinema }}</p>
+              <h6 class="card-title mb-1 text-truncate">{{ movie.name }}</h6>
+              <p class="card-text mb-0 text-muted small">{{ movie.duration }} phút</p>
             </div>
           </div>
         </ng-container>
@@ -61,7 +61,7 @@
         <span class="label-total">Tổng: {{ totalItems | number }}</span>
         <ng-select
           [items]="PAGINATION_PAGE_SIZE"
-          [(ngModel)]="showsFilter.size"
+          [(ngModel)]="moviesFilter.size"
           (ngModelChange)="onSearch()"
         >
         </ng-select>
@@ -69,8 +69,8 @@
       <ngb-pagination
         class="pagination"
         [collectionSize]="totalItems"
-        [pageSize]="showsFilter.size"
-        [page]="showsFilter.page"
+        [pageSize]="moviesFilter.size"
+        [page]="moviesFilter.page"
         [directionLinks]="true"
         [maxSize]="5"
         (pageChange)="loadMore($event)"
