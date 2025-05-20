@@ -10,12 +10,10 @@ USE `hdv_customer`;
 DROP TABLE IF EXISTS `customer`;
 CREATE TABLE `customer` (
     `id` int NOT NULL AUTO_INCREMENT,
-    `fullname` varchar(255) DEFAULT NULL,
+    `fullname` varchar(255) NOT NULL,
     `email` varchar(100) NOT NULL,
     `phone` varchar(20) NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY uk_customer_email (email),
-    UNIQUE KEY uk_customer_phone (phone),
     INDEX idx_customer_name (fullName),
     INDEX idx_customer_email (email),
     INDEX idx_customer_phone (phone)

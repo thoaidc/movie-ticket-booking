@@ -8,6 +8,7 @@ import vn.ptit.moviebooking.notification.entity.Notification;
 import vn.ptit.moviebooking.notification.repository.NotificationRepository;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Service
 public class NotificationService {
@@ -20,6 +21,10 @@ public class NotificationService {
 
     @Transactional
     public Notification sendNotification(NotificationRequest notificationRequest) {
+        if (Objects.isNull(notificationRequest)) {
+            return null;
+        }
+
         Notification notification = new Notification();
         notification.setReceiver(notificationRequest.getReceiver());
         notification.setSender(notificationRequest.getSender());
