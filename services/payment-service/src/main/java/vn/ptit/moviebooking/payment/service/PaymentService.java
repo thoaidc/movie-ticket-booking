@@ -11,6 +11,7 @@ import vn.ptit.moviebooking.payment.repository.PaymentRepository;
 import vn.ptit.moviebooking.payment.repository.RefundRepository;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -34,13 +35,13 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment paymentProcessTest(Payment payment) {
-        try {
+    public Payment paymentProcessTest(Payment payment, PaymentRequest paymentRequest) {
+        if (Objects.equals(paymentRequest.getAtm(), "123") && Objects.equals(paymentRequest.getPin(), "123")) {
             payment.setPaymentTime(Instant.now());
             payment.setTransactionId(UUID.randomUUID().toString());
             payment.setStatus(PaymentConstants.PaymentStatus.COMPLETED);
             return paymentRepository.save(payment);
-        } catch (Exception e) {
+        } else {
             payment.setStatus(PaymentConstants.PaymentStatus.FAILED);
             return paymentRepository.save(payment);
         }

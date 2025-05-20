@@ -42,7 +42,7 @@ public class SagaConsumer {
         try {
             PaymentRequest paymentRequest = command.getPaymentRequest();
             Payment payment = paymentService.createPayment(paymentRequest);
-            payment = paymentService.paymentProcessTest(payment);
+            payment = paymentService.paymentProcessTest(payment, paymentRequest);
 
             boolean isPaymentSuccess = Objects.equals(PaymentConstants.PaymentStatus.COMPLETED, payment.getStatus());
             replyMessage.setStatus(isPaymentSuccess);

@@ -49,10 +49,20 @@
 
     <div style="width: 180px; height: 2px"></div>
   </div>
+
+  <ng-container *ngIf="step !== 'INIT'">
+    <div class="booking-status mb-5">
+      <h5>Trạng thái đơn hàng</h5>
+
+      <span>{{ bookingStatus }}</span>
+    </div>
+  </ng-container>
 </div>
 
-<div class="modal-footer">
+<div class="modal-footer py-3">
   <div class="btn-row col-md-12 d-flex justify-content-end m-0">
-    <button type="button" class="btn-delete me-2 mb-1" (click)="dismiss()">Huỷ</button>
+    <button type="button" class="btn-delete me-2 mb-1" (click)="dismiss()" *ngIf="step !== 'COMPLETED'">Huỷ</button>
+    <button type="button" class="save-button-dialog me-2 mb-1" (click)="createBooking()" *ngIf="step === 'INIT'">Đặt vé</button>
+    <button type="button" class="success-button-dialog me-2 mb-1" (click)="dismiss()" *ngIf="step === 'COMPLETED'">Đóng</button>
   </div>
 </div>

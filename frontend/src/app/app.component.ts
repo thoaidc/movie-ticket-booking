@@ -3,8 +3,6 @@ import {RouterOutlet} from '@angular/router';
 import {LoadingBarModule} from '@ngx-loading-bar/core';
 import {Subscription} from 'rxjs';
 import {WebsocketService} from './core/services/websocket.service';
-import {IMessage} from '@stomp/stompjs';
-import {BaseResponse} from './core/models/response.model';
 import {DateFilterComponent} from './shared/components/date-filter/date-filter.component';
 import {NgbDatepickerModule, NgbModal, NgbModalRef, NgbPagination, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import {NgSelectModule} from '@ng-select/ng-select';
@@ -44,7 +42,6 @@ import {UtilsService} from './shared/utils/utils.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
   private stateSubscription: Subscription | null = null;
-  private topicSubscription: Subscription | null = null;
   private modalRef: NgbModalRef | undefined;
   periods: number = 1;  // Today
   totalItems: number = 0;
@@ -70,16 +67,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.onSearch();
     this.stateSubscription = this.websocketService.onState().subscribe();
     this.websocketService.connect();
-
-    this.topicSubscription = this.websocketService.subscribeToTopic(`/topics/bookings`).subscribe({
-      next: (message: IMessage) => this.handleWebSocketMessage(message),
-      error: (e) => console.log(e)
-    });
-  }
-
-  private handleWebSocketMessage(message: IMessage) {
-    const response: BaseResponse<any> = JSON.parse(message.body) as BaseResponse<any>;
-    console.log(response);
   }
 
   onTimeChange(even: any) {
@@ -142,7 +129,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.stateSubscription) {
-      this.websocketService.unsubscribeFromTopic(`/topics/bookings`);
       this.stateSubscription.unsubscribe();
     }
 
