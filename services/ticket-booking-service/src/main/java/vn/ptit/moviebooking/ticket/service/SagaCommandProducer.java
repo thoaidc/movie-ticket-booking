@@ -16,6 +16,7 @@ import vn.ptit.moviebooking.ticket.constants.WebSocketConstants;
 import vn.ptit.moviebooking.ticket.dto.request.BookingRequest;
 import vn.ptit.moviebooking.ticket.dto.request.CheckSeatAvailabilityRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.ConfirmSeatsRequestCommand;
+import vn.ptit.moviebooking.ticket.dto.request.NotificationCommand;
 import vn.ptit.moviebooking.ticket.dto.request.PaymentRequest;
 import vn.ptit.moviebooking.ticket.dto.request.PaymentRequestCommand;
 import vn.ptit.moviebooking.ticket.dto.request.RefundRequestCommand;
@@ -222,6 +223,8 @@ public class SagaCommandProducer {
                 log.info("[BOOKING] - Confirm booked seats! Booking completed.");
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.COMPLETED);
                 response = BaseResponseDTO.builder().message("Booking completed successfully!").ok(BookingStep.COMPLETED);
+                NotificationCommand command = ticketBookingService.createNotificationCommand(replyMessage);
+                rabbitMQProducer.sendMessage(RabbitMQConstants.RoutingKey.NOTIFICATION_COMMAND, command);
             } else {
                 // Booked seats failed -> Refund to customer + Reserve held booking seats + Cancel booking
                 log.info("[BOOKING] - Confirm booked seats failed! Cancel booking.");
@@ -286,6 +289,32 @@ public class SagaCommandProducer {
                 response = BaseResponseDTO.builder().message("Refund to customer successfully!").ok();
             } else {
                 log.info("[BOOKING] - Refund to customer failed!");
+            }
+
+            rabbitMQProducer.confirmProcessed(channel, amqpMessage);
+        } catch (Exception e) {
+            rabbitMQProducer.notifyError(channel, amqpMessage, false);
+            log.error("Could not execute response from payment-service when refund to customer", e);
+        }
+
+        notificationService.sendMessageToTopic(WebSocketConstants.Topic.BOOKING_TOPIC, response);
+    }
+
+    @RabbitListener(queues = RabbitMQConstants.Queue.NOTIFICATION_REPLY)
+    public void handleNotificationReply(BaseCommandReplyMessage replyMessage, Channel channel, Message amqpMessage) {
+        BaseResponseDTO response = BaseResponseDTO.builder()
+                .code(HttpStatusConstants.BAD_REQUEST)
+                .success(false)
+                .message("Sent email notification failed!")
+                .build();
+        log.info("[BOOKING] - Sent email notification replied");
+
+        try {
+            if (replyMessage.isSuccess()) {
+                log.info("[BOOKING] - Sent email notification to customer successfully!");
+                response = BaseResponseDTO.builder().message("Sent notification successfully! Check your emails").ok();
+            } else {
+                log.info("[BOOKING] - Sent email notification to customer failed!");
             }
 
             rabbitMQProducer.confirmProcessed(channel, amqpMessage);

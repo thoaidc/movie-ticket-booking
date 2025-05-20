@@ -41,7 +41,8 @@ public class SagaConsumer {
             NotificationRequest notificationRequest = command.getNotificationRequest();
             Notification notification = notificationService.sendNotification(notificationRequest);
 
-            boolean isSentSuccess = Objects.equals(NotificationConstants.NotificationStatus.SUCCESS, notification.getStatus());
+            boolean isSentSuccess = Objects.nonNull(notification)
+                    && Objects.equals(NotificationConstants.NotificationStatus.SUCCESS, notification.getStatus());
             replyMessage.setStatus(isSentSuccess);
             replyMessage.setResult(notification);
             log.info("[BOOKING] - Sent notification status: {}", isSentSuccess);

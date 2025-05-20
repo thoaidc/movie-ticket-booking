@@ -24,10 +24,10 @@ public class Customer {
     @Column(name = "fullname", nullable = false)
     private String fullname;
 
-    @Column(name = "email", length = 100, nullable = false, unique = true)
+    @Column(name = "email", length = 100, nullable = false)
     private String email;
 
-    @Column(name = "phone", length = 20, nullable = false, unique = true)
+    @Column(name = "phone", length = 20, nullable = false)
     private String phone;
 
     public Integer getId() {
