@@ -54,7 +54,9 @@
     <div class="booking-status mb-5">
       <h5>Trạng thái đơn hàng</h5>
 
-      <span>{{ bookingStatus }}</span>
+      <div class="booking-flow">
+        <p class="mb-0" *ngFor="let status of bookingStatus">{{ status }}</p>
+      </div>
     </div>
   </ng-container>
 </div>

@@ -44,8 +44,10 @@ export class BookingModalComponent implements OnInit, OnDestroy {
   seats: Seat[] = [];
   seatsShow: SeatShow[] = [];
   step: string = 'INIT';
-  bookingStatus: string = '';
+  bookingStatus: string[] = [];
   private topicSubscription: Subscription | null = null;
+  private bookingId: number = 0;
+  private totalPayment: number = 0;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -149,16 +151,9 @@ export class BookingModalComponent implements OnInit, OnDestroy {
 
     this.bookingService.createBookingRequest(bookingRequest).subscribe(response => {
       if (response.status && response.result > 0) {
+        this.bookingId = response.result;
+        this.totalPayment = bookingRequest.totalAmount;
         this.step = 'VERIFY';
-        this.modalRef = this.modalService.open(VerifyCustomerModalComponent, {backdrop: 'static'});
-        this.modalRef.componentInstance.bookingId = response.result;
-        this.modalRef.componentInstance.initialize();
-
-        this.modalRef.closed.subscribe((result: boolean) => {
-          if (result) {
-            this.openPaymentModal(response.result, bookingRequest.totalAmount);
-          }
-        });
 
         this.topicSubscription = this.webSocketService.subscribeToTopic('/topics/bookings').subscribe({
           next: (message: IMessage) => this.handleWebSocketMessage(message),
@@ -171,17 +166,45 @@ export class BookingModalComponent implements OnInit, OnDestroy {
   }
 
   openPaymentModal(bookingId: number, totalPayment: number) {
-    this.step = 'PAYMENT';
     this.modalRef = this.modalService.open(PaymentModalComponent, {backdrop: 'static'});
     this.modalRef.componentInstance.bookingId = bookingId;
     this.modalRef.componentInstance.totalPayment = totalPayment;
     this.modalRef.componentInstance.initialize();
   }
 
+  openVerifyCustomerModal(bookingId: number) {
+    this.modalRef = this.modalService.open(VerifyCustomerModalComponent, {backdrop: 'static'});
+    this.modalRef.componentInstance.bookingId = bookingId;
+    this.modalRef.componentInstance.initialize();
+  }
+
   private handleWebSocketMessage(message: IMessage) {
     const response: BaseResponse<any> = JSON.parse(message.body) as BaseResponse<any>;
-    this.bookingStatus = response.message || 'UNKNOWN';
-    console.log(response);
+    this.bookingStatus.push(response.message || 'Processing');
+
+    if (response.status) {
+      if (response.result) {
+        this.step = response.result;
+
+        if (response.result === 'VERIFY_CUSTOMER') {
+          this.openVerifyCustomerModal(this.bookingId);
+        }
+
+        if (response.result === 'PAYMENT') {
+          this.openPaymentModal(this.bookingId, this.totalPayment);
+        }
+      }
+    } else {
+      if (response.result) {
+        if (response.result === 'VERIFY_CUSTOMER') {
+          this.step = 'VERIFY_CUSTOMER_FAILED';
+        }
+
+        if (response.result === 'PAYMENT') {
+          this.step = 'PAYMENT_FAILED';
+        }
+      }
+    }
   }
 
   dismiss() {

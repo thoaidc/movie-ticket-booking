@@ -43,6 +43,12 @@ public class SagaCommandProducer {
         this.notificationService = notificationService;
     }
 
+    interface BookingStep {
+        String VERIFY_CUSTOMER = "VERIFY_CUSTOMER";
+        String PAYMENT = "PAYMENT";
+        String COMPLETED = "COMPLETED";
+    }
+
     public BaseResponseDTO createBookingSagaOrchestrator(BookingRequest bookingRequest) {
         // Create booking with PENDING status
         ValidateMovieRequestCommand command = ticketBookingService.createValidateMovieCommand(bookingRequest);
@@ -90,12 +96,13 @@ public class SagaCommandProducer {
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
                 .message("Seat held failed! Cancel booking...")
+                .result(BookingStep.VERIFY_CUSTOMER)
                 .build();
 
         try {
             // Seats availability + Held seats successfully -> Verify customer + Save customer info
             if (replyMessage.isSuccess()) {
-                response = BaseResponseDTO.builder().message("Seats held successfully!").ok();
+                response = BaseResponseDTO.builder().message("Seats held successfully!").ok(BookingStep.VERIFY_CUSTOMER);
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.SEAT_RESERVED);
                 log.debug("[BOOKING] - Seats availability! Seats held successfully!");
             } else {
@@ -127,12 +134,13 @@ public class SagaCommandProducer {
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
                 .message("Your information verified failed! Cancel booking...")
+                .result(BookingStep.PAYMENT)
                 .build();
 
         try {
             // Customer verified successfully -> Payment process
             if (replyMessage.isSuccess()) {
-                response = BaseResponseDTO.builder().message("Your information verified successfully!").ok();
+                response = BaseResponseDTO.builder().message("Your information verified successfully!").ok(BookingStep.PAYMENT);
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.CUSTOMER_VERIFIED);
                 ticketBookingService.updateBookingCustomerInfo(replyMessage);
                 log.debug("[BOOKING] - Customer information verified successfully!");
@@ -200,12 +208,13 @@ public class SagaCommandProducer {
                 .code(HttpStatusConstants.BAD_REQUEST)
                 .success(false)
                 .message("Confirmation of booked seat failed! Cancel booking...")
+                .result(BookingStep.COMPLETED)
                 .build();
 
         try {
             // Booked seats successfully -> Confirm order completed
             if (replyMessage.isSuccess()) {
-                response = BaseResponseDTO.builder().message("Booking successfully!").ok();
+                response = BaseResponseDTO.builder().message("Booking completed successfully!").ok(BookingStep.COMPLETED);
                 ticketBookingService.updateBookingStatus(replyMessage.getSagaId(), BookingConstants.Status.COMPLETED);
                 log.debug("[BOOKING] - Confirm booked seats! Booking completed.");
             } else {
