@@ -1,16 +1,27 @@
-# Service A
 
-## Overview
-Service A handles [specific functionality, e.g., user authentication or data processing]. It is a microservice built with Python Flask.
+# 📄 Customer Service
 
-## Setup
-- Built using the provided `Dockerfile`.
-- Source code is in the `src/` folder.
+## 📝 Tổng Quan
 
-## Development
-- Define APIs in `docs/api-specs/service-a.yaml`.
-- Run locally via `docker-compose up --build` from the root directory.
+**Customer Service** chịu trách nhiệm quản lý thông tin khách hàng và xác minh đặt vé. Đây là một microservice được xây dựng bằng **...**.
 
-## Endpoints
-- Base URL: `http://localhost:5001/`
-- Refer to `docs/api-specs/service-a.yaml` for API details.
+## ⚙️ Thiết Lập
+
+* Được xây dựng từ `Dockerfile` cung cấp sẵn.
+* Mã nguồn nằm trong thư mục `src/`.
+
+## 👨‍💻 Phát Triển
+
+* Các API được định nghĩa trong file: `docs/api-specs/customer-service.yaml`.
+* Để chạy cục bộ, sử dụng lệnh:
+
+  ```bash
+  docker-compose up --build
+  ```
+
+  từ thư mục gốc của dự án.
+
+## 🌐 API Endpoint
+
+* Base URL: `http://localhost:5002/`
+* Tham khảo chi tiết API tại: `docs/api-specs/customer-service.yaml`
