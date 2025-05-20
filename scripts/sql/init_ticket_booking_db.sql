@@ -1,7 +1,7 @@
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
 -- Host: localhost    Database: hdv_ticket_booking
--- ------------------------------------------------------
+-- -----------------------------------------------------
 -- Server version	8.0.37
 
 CREATE DATABASE IF NOT EXISTS `hdv_ticket_booking` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT ENCRYPTION='N';

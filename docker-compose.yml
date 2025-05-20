@@ -46,6 +46,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hdv_movie
+    ports:
+      - "3300:3306"
     volumes:
       - hdv_movie_data:/var/lib/mysql
     networks:
@@ -63,6 +65,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hdv_seat_availability
+    ports:
+      - "3301:3306"
     volumes:
       - hdv_seat_availability_data:/var/lib/mysql
     networks:
@@ -80,6 +84,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hdv_customer
+    ports:
+      - "3302:3306"
     volumes:
       - hdv_customer_data:/var/lib/mysql
     networks:
@@ -97,6 +103,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hdv_payment
+    ports:
+      - "3303:3306"
     depends_on:
       hdv-customer-db:
         condition: service_healthy
@@ -117,6 +125,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hdv_ticket_booking
+    ports:
+      - "3304:3306"
     depends_on:
       hdv-payment-db:
         condition: service_healthy
@@ -137,6 +147,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hdv_notification
+    ports:
+      - "3305:3306"
     volumes:
       - hdv_notification_data:/var/lib/mysql
     networks:

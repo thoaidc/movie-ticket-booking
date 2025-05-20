@@ -93,7 +93,7 @@ INSERT INTO `cinema_room` (`cinema_id`, `name`, `capacity`, `screen_type`) VALUE
 
 -- Insert data into movie table
 INSERT INTO `movie` (`name`, `description`, `duration`, `director`, `genre`, `release_date`) VALUES
-                                                                                                 ('The Avengers: Endgame', 'After the devastating events of Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos\' actions and restore balance to the universe.', 181, 'Anthony Russo, Joe Russo', 'Action, Adventure, Fantasy', '2024-04-26 00:00:00'),
+('The Avengers: Endgame', 'After the devastating events of Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos\' actions and restore balance to the universe.', 181, 'Anthony Russo, Joe Russo', 'Action, Adventure, Fantasy', '2024-04-26 00:00:00'),
 ('Parasite', 'Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.', 132, 'Bong Joon Ho', 'Drama, Thriller', '2024-05-02 00:00:00'),
 ('Inception', 'A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.', 148, 'Christopher Nolan', 'Action, Adventure, Sci-Fi', '2025-04-16 00:00:00'),
 ('The Shaw shank Redemption', 'Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.', 142, 'Frank Darabont', 'Drama', '2023-04-22 00:00:00'),

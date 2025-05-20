@@ -22,5 +22,5 @@ for i in $(seq 1 $MAX_RETRIES); do
 done
 
 # If you run the whole round and still fail
-echo "All $MAX_RETRIES attempts failed. Exiting with error."
+echo "All $MAX_RETRIES attempts failed. Exiting with error"
 exit 1
