@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {AlphanumericOnlyDirective} from "../../shared/directives/alphanumeric-only.directive";
 import {FormsModule} from "@angular/forms";
 import {Location, NgIf} from '@angular/common';
@@ -18,7 +18,7 @@ import {ToastrService} from 'ngx-toastr';
   templateUrl: './verify-customer-modal.component.html',
   styleUrl: './verify-customer-modal.component.scss'
 })
-export class VerifyCustomerModalComponent implements OnChanges {
+export class VerifyCustomerModalComponent {
   customer: Customer = {
     fullname: '',
     email: '',
@@ -39,13 +39,13 @@ export class VerifyCustomerModalComponent implements OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['bookingId']) {
-      this.customer.bookingId = changes['bookingId'].currentValue;
-    }
+  initialize() {
+    this.customer.bookingId = this.bookingId;
   }
 
   confirm() {
+    this.initialize();
+
     this.bookingService.verifyCustomerInfo(this.customer).subscribe(response => {
       if (response.status) {
         this.toast.success('Đang xác minh thông tin của bạn', 'Thông báo');

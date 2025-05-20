@@ -47,6 +47,6 @@
 
 <div class="modal-footer py-3">
   <div class="btn-row col-md-12 d-flex justify-content-end m-0">
-    <button type="button" class="save-button-dialog me-2 mb-1" (click)="confirm()">Xác nhận</button>
+    <button type="button" class="save-button-dialog me-2 mb-1" [disabled]="bookingId === 0" (click)="confirm()">Xác nhận</button>
   </div>
 </div>

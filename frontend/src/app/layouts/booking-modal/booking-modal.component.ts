@@ -152,6 +152,7 @@ export class BookingModalComponent implements OnInit, OnDestroy {
         this.step = 'VERIFY';
         this.modalRef = this.modalService.open(VerifyCustomerModalComponent, {backdrop: 'static'});
         this.modalRef.componentInstance.bookingId = response.result;
+        this.modalRef.componentInstance.initialize();
 
         this.modalRef.closed.subscribe((result: boolean) => {
           if (result) {
@@ -174,6 +175,7 @@ export class BookingModalComponent implements OnInit, OnDestroy {
     this.modalRef = this.modalService.open(PaymentModalComponent, {backdrop: 'static'});
     this.modalRef.componentInstance.bookingId = bookingId;
     this.modalRef.componentInstance.totalPayment = totalPayment;
+    this.modalRef.componentInstance.initialize();
   }
 
   private handleWebSocketMessage(message: IMessage) {

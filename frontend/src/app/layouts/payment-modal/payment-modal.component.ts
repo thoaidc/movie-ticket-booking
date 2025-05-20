@@ -1,5 +1,4 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {AlphanumericOnlyDirective} from '../../shared/directives/alphanumeric-only.directive';
+import {Component, Input} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {Location} from '@angular/common';
@@ -14,7 +13,7 @@ import {Payment} from '../../core/models/bookings.model';
   templateUrl: './payment-modal.component.html',
   styleUrl: './payment-modal.component.scss'
 })
-export class PaymentModalComponent implements OnChanges {
+export class PaymentModalComponent {
   paymentInfo: Payment = {
     atm: '',
     pin: '',
@@ -36,17 +35,14 @@ export class PaymentModalComponent implements OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['bookingId']) {
-      this.paymentInfo.bookingId = changes['bookingId'].currentValue;
-    }
-
-    if (changes['totalPayment']) {
-      this.paymentInfo.amount = changes['totalPayment'].currentValue;
-    }
+  initialize() {
+    this.paymentInfo.bookingId = this.bookingId;
+    this.paymentInfo.amount = this.totalPayment;
   }
 
   confirm() {
+    this.initialize();
+
     this.bookingService.payment(this.paymentInfo).subscribe(response => {
       if (response.status) {
         this.toast.success('Thanh toán đang được xử lý', 'Thông báo');
@@ -54,7 +50,7 @@ export class PaymentModalComponent implements OnChanges {
         this.toast.error('Gửi yêu cầu thanh toán thất bại', 'Thông báo');
       }
 
-      this.activeModal.close();
+      this.activeModal.close(response.status);
     });
   }
 
