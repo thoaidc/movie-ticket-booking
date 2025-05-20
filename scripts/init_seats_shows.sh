@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Waiting for services and gateway to be healthy..."
-sleep 30  # Wait 30s for the services to start
+sleep 45  # Wait 45s for the services to start
 
 MAX_RETRIES=10
 RETRY_INTERVAL=10
