@@ -3,7 +3,15 @@
 
 ## 📝 Tổng Quan
 
-**Customer Service** chịu trách nhiệm quản lý thông tin khách hàng và xác minh đặt vé. Đây là một microservice được xây dựng bằng **...**.
+**Customer Service** chịu trách nhiệm quản lý thông tin khách hàng và xác minh đặt vé.
+
+## Kiến trúc
+
+* Sử dụng Spring Boot, Spring cloud gateway + service discovery
+* MySQL làm cơ sở dữ liệu chính
+* RabbitMQ cho message queue
+* Tích hợp với các dịch vụ khác thông qua HTTP
+* RESTful API design
 
 ## ⚙️ Thiết Lập
 
@@ -23,5 +31,10 @@
 
 ## 🌐 API Endpoint
 
-* Base URL: `http://localhost:5002/`
-* Tham khảo chi tiết API tại: `docs/api-specs/customer-service.yaml`
+* Base URL: `http://localhost:8080`
+
+## 🌐 API chi tiết
+
+* `GET /api/customers/{customerId}` - Lấy chi tiết thông tin khách hàng
+
+

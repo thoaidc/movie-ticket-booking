@@ -1,16 +1,38 @@
-# Service A
 
-## Overview
-Service A handles [specific functionality, e.g., user authentication or data processing]. It is a microservice built with Python Flask.
+# 🎟️ Ticket Booking Service
 
-## Setup
-- Built using the provided `Dockerfile`.
-- Source code is in the `src/` folder.
+## 📝 Tổng Quan
 
-## Development
-- Define APIs in `docs/api-specs/service-a.yaml`.
-- Run locally via `docker-compose up --build` from the root directory.
+**Ticket Booking Service** điều phối toàn bộ quy trình đặt vé xem phim — từ việc chọn phim, chọn ghế, xác minh thông tin khách hàng, kiểm tra ghế trống, thanh toán, cho đến gửi thông báo xác nhận. 
 
-## Endpoints
-- Base URL: `http://localhost:5001/`
-- Refer to `docs/api-specs/service-a.yaml` for API details.
+## Kiến trúc
+
+* Sử dụng Spring Boot, Spring cloud gateway + service discovery
+* MySQL làm cơ sở dữ liệu chính
+* RabbitMQ cho message queue
+* Tích hợp với các dịch vụ khác thông qua HTTP
+* RESTful API design
+
+## ⚙️ Thiết Lập
+
+* Được xây dựng bằng `Dockerfile` đã cung cấp.
+* Mã nguồn nằm trong thư mục `src/`.
+
+## 👨‍💻 Phát Triển
+
+* Các API được định nghĩa trong: `docs/api-specs/ticket-booking-service.yaml`.
+* Để chạy cục bộ, sử dụng lệnh:
+
+  ```bash
+  docker-compose up --build
+  ```
+
+## 🌐 API Endpoint
+
+* Base URL: `http://localhost:8080/`
+
+## 🌐 API chi tiết
+
+* `POST /api/bookings` - Đặt vé
+* `POST /api/bookings/customers/verify` - Xác nhận thông tin khách hàng
+* `POST /api/bookings/payments` - Thanh toán

@@ -1,59 +1,64 @@
-# MyAngular18App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.0-rc.0.
+# 🌐 Frontend (Angular 18)
 
-## Development server
+## 📝 Tổng Quan
 
-To start a local development server, run:
+Đây là mô-đun giao diện người dùng (frontend) trong bài tập hệ thống microservice. Giao diện được xây dựng bằng **Angular 18**, chịu trách nhiệm hiển thị UI và giao tiếp với các dịch vụ backend.
 
-```bash
-ng serve
-```
+## 🛠️ Công Nghệ Sử Dụng
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+* **Framework**: Angular 18
+* **Styling**: SCSS
+* **Trình quản lý gói**: npm
 
-## Code scaffolding
+## 🚀 Bắt Đầu
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+1. Clone repository:
 
-```bash
-ng generate component component-name
-```
+   ```bash
+   git clone <repository-url>
+   ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+2. Di chuyển vào thư mục frontend:
 
-```bash
-ng generate --help
-```
+   ```bash
+   cd frontend
+   ```
 
-## Building
+3. Cài đặt dependencies:
 
-To build the project run:
+   ```bash
+   npm install
+   ```
 
-```bash
-ng build
-```
+4. Khởi chạy server phát triển:
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+   ```bash
+   ng serve
+   ```
 
-## Running unit tests
+   hoặc:
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+   ```bash
+   npm start
+   ```
 
-```bash
-ng test
-```
+5. Truy cập trình duyệt tại:
 
-## Running end-to-end tests
+   ```
+   http://localhost:4200/
+   ```
 
-For end-to-end (e2e) testing, run:
+## 📁 Cấu Trúc Thư Mục
 
-```bash
-ng e2e
-```
+* `src/` – Chứa mã nguồn chính.
+* `app/` – Thành phần, dịch vụ và module của ứng dụng.
+* `assets/` – Các tệp tĩnh (ảnh, CSS...).
+* `environments/` – Cấu hình môi trường (dev, prod).
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 🧾 Scripts
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+* `npm start` – Chạy ứng dụng ở chế độ phát triển.
+* `npm run build` – Biên dịch project ở chế độ production.
+* `ng test` – Chạy unit test.
+* `ng lint` – Kiểm tra lỗi lint.

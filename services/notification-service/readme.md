@@ -1,16 +1,34 @@
-# Service A
 
-## Overview
-Service A handles [specific functionality, e.g., user authentication or data processing]. It is a microservice built with Python Flask.
 
-## Setup
-- Built using the provided `Dockerfile`.
-- Source code is in the `src/` folder.
+# 📢 Notification Service
 
-## Development
-- Define APIs in `docs/api-specs/service-a.yaml`.
-- Run locally via `docker-compose up --build` from the root directory.
+## 📝 Tổng Quan
 
-## Endpoints
-- Base URL: `http://localhost:5001/`
-- Refer to `docs/api-specs/service-a.yaml` for API details.
+**Notification Service** chịu trách nhiệm gửi thông báo xác nhận qua email cho khách hàng sau khi đặt vé và thanh toán thành công. 
+
+## Kiến trúc
+
+* Sử dụng Spring Boot, Spring cloud gateway + service discovery
+* MySQL làm cơ sở dữ liệu chính
+* RabbitMQ cho message queue
+* Tích hợp với các dịch vụ khác thông qua HTTP
+* RESTful API design
+
+## ⚙️ Thiết Lập
+
+* Được xây dựng bằng `Dockerfile` có sẵn.
+* Mã nguồn được đặt trong thư mục `src/`.
+
+## 👨‍💻 Phát Triển
+
+* Các API được định nghĩa trong file: `docs/api-specs/notification-service.yaml`.
+* Để chạy cục bộ, sử dụng lệnh sau từ thư mục gốc:
+
+  ```bash
+  docker-compose up --build
+  ```
+
+## 🌐 API Endpoint
+
+* Base URL: `http://localhost:8080/`
+

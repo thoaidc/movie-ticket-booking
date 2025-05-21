@@ -30,6 +30,9 @@ Dự án này triển khai một hệ thống đặt vé xem phim theo kiến tr
 
 ### 🛎️ Utility Service
 
+* **Discovery Service**
+  Quản lý việc đăng ký và phát hiện các microservice khác trong hệ thống.
+
 * **Notification Service**
   Gửi email xác nhận cho khách hàng sau khi đặt vé và thanh toán thành công.
 
