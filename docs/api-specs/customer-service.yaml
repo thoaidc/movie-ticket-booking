@@ -1,0 +1,80 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Customer service",
+    "description": "Dịch vụ quản lý thông tin khách hàng đặt vé",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8100",
+      "description": "Đường dẫn service tại môi trường dev"
+    }
+  ],
+  "paths": {
+    "/api/customers/{customerId}": {
+      "get": {
+        "tags": [
+          "customer-resource"
+        ],
+        "operationId": "getCustomerById",
+        "description": "Lấy thông tin khách hàng theo ID",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BaseResponseDTO": {
+        "type": "object",
+        "description": "Response chung cho các phản hồi HTTP trong ứng dụng",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Mã code trạng thái HTTP"
+          },
+          "status": {
+            "type": "boolean",
+            "description": "Trạng thái xử lý dữ liệu thành công hay thất bại"
+          },
+          "message": {
+            "type": "string",
+            "description": "Tin nhắn phản hồi"
+          },
+          "result": {
+            "type": "object",
+            "description": "Dữ liệu trả về nếu có"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tổng số bản ghi nếu truy vấn với phân trang"
+          }
+        }
+      }
+    }
+  }
+}

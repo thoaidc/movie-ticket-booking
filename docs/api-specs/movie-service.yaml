@@ -1,0 +1,312 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Movie service",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8101",
+      "description": "Đường dẫn service ở môi trường dev"
+    }
+  ],
+  "paths": {
+    "/api/shows/{movieId}": {
+      "get": {
+        "tags": [
+          "show-resource"
+        ],
+        "operationId": "getAllShowsByMovieId",
+        "description": "Lấy tất cả các suất chiếu của 1 phim theo ID",
+        "parameters": [
+          {
+            "name": "movieId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/seats/by-show/{showId}": {
+      "get": {
+        "tags": [
+          "seat-resource"
+        ],
+        "operationId": "getAllSeatsByShowId",
+        "description": "Lấy tất cả các ghế của suất chiếu theo ID",
+        "parameters": [
+          {
+            "name": "showId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/seats/by-all-shows": {
+      "get": {
+        "tags": [
+          "seat-resource"
+        ],
+        "operationId": "getAllSeatsGroupedByShow",
+        "description": "Lấy tất cả các ghế của tất cả các show. Phục vụ khởi tạo dữ liệu cho Seat availability service",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/movies": {
+      "get": {
+        "tags": [
+          "movie-resource"
+        ],
+        "operationId": "getAllMoviesWithPaging",
+        "description": "Lấy tất cả các phim đang chiếu với phân trang",
+        "parameters": [
+          {
+            "name": "request",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/BaseRequestDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/movies/{movieId}": {
+      "get": {
+        "tags": [
+          "movie-resource"
+        ],
+        "operationId": "getMovieDetail",
+        "description": "Lấy thông tin chi tiết của phim theo ID",
+        "parameters": [
+          {
+            "name": "movieId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cinemas": {
+      "get": {
+        "tags": [
+          "cinema-resource"
+        ],
+        "operationId": "getAllCinemas",
+        "description": "Lấy thông tin các rạp chiếu phim",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BaseResponseDTO": {
+        "type": "object",
+        "description": "Response chung cho các phản hồi HTTP trong ứng dụng",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Mã code trạng thái HTTP"
+          },
+          "status": {
+            "type": "boolean",
+            "description": "Trạng thái xử lý dữ liệu thành công hay thất bại"
+          },
+          "message": {
+            "type": "string",
+            "description": "Tin nhắn phản hồi"
+          },
+          "result": {
+            "type": "object",
+            "description": "Dữ liệu trả về nếu có"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tổng số bản ghi nếu truy vấn với phân trang"
+          }
+        }
+      },
+      "BaseRequestDTO": {
+        "type": "object",
+        "description": "Request chung cho các yêu cầu có phân trang và filter theo điều kiện",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Số thứ tự trang cần truy vấn theo phân trang"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Số lượng phần tử một trang theo phân trang"
+          },
+          "sort": {
+            "type": "string",
+            "description": "Sắp sếp kết quả theo trường dữ liệu nào"
+          },
+          "fromDate": {
+            "type": "string",
+            "description": "Thời gian bắt đầu khi truy vấn bản ghi"
+          },
+          "toDate": {
+            "type": "string",
+            "description": "Thời gian kết thúc khi truy vấn bản ghi"
+          },
+          "keyword": {
+            "type": "string",
+            "description": "Từ khóa tìm kiếm khi truy vấn"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "fromDateSearch": {
+            "type": "string",
+            "description": "FromDate sau khi convert sang định dạng chuẩn"
+          },
+          "toDateSearch": {
+            "type": "string",
+            "description": "ToDate sau khi convert sang định dạng chuẩn"
+          },
+          "keywordSearch": {
+            "type": "string",
+            "description": "Keyword sau khi convert sang định dạng chuẩn"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SortObject"
+            }
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "paged": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": "string"
+          },
+          "nullHandling": {
+            "type": "string"
+          },
+          "ascending": {
+            "type": "boolean"
+          },
+          "property": {
+            "type": "string"
+          },
+          "ignoreCase": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

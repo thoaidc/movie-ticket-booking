@@ -1,0 +1,216 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Ticket booking service",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8105",
+      "description": "Đường dẫn service ở môi trường dev"
+    }
+  ],
+  "paths": {
+    "/api/bookings": {
+      "post": {
+        "tags": [
+          "booking-controller"
+        ],
+        "operationId": "createBooking",
+        "description": "Khởi tạo yêu cầu đặt vé xem phim",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bookings/payments": {
+      "post": {
+        "tags": [
+          "booking-controller"
+        ],
+        "operationId": "payment",
+        "description": "Gửi thông tin thanh toán",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bookings/customers/verify": {
+      "post": {
+        "tags": [
+          "booking-controller"
+        ],
+        "operationId": "enterCustomerInfo",
+        "description": "Gửi thông tin khách hàng đặt vé để xác minh và lưu",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCustomerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BookingRequest": {
+        "type": "object",
+        "description": "Thông tin đặt vé",
+        "properties": {
+          "showId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "ID suất chiếu"
+          },
+          "movieId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "ID phim"
+          },
+          "seatIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Danh sách ID ghế ngồi"
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "float",
+            "description": "Tổng tiền thanh toán"
+          }
+        }
+      },
+      "BaseResponseDTO": {
+        "type": "object",
+        "description": "Response chung cho các phản hồi HTTP trong ứng dụng",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Mã code trạng thái HTTP"
+          },
+          "status": {
+            "type": "boolean",
+            "description": "Trạng thái xử lý dữ liệu thành công hay thất bại"
+          },
+          "message": {
+            "type": "string",
+            "description": "Tin nhắn phản hồi"
+          },
+          "result": {
+            "type": "object",
+            "description": "Dữ liệu trả về nếu có"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tổng số bản ghi nếu truy vấn với phân trang"
+          }
+        }
+      },
+      "PaymentRequest": {
+        "type": "object",
+        "description": "Thông tin thanh toán",
+        "properties": {
+          "bookingId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "ID của đơn hàng đang xử lý"
+          },
+          "amount": {
+            "type": "number",
+            "format": "float",
+            "description": "Số tiền thanh toán"
+          },
+          "atm": {
+            "type": "string",
+            "description": "Số thẻ ATM"
+          },
+          "pin": {
+            "type": "string",
+            "description": "Mã PIN thẻ ATM"
+          }
+        }
+      },
+      "VerifyCustomerRequest": {
+        "type": "object",
+        "description": "Thông tin liên hệ của khách hàng",
+        "properties": {
+          "bookingId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "ID đơn hàng đang xử lý"
+          },
+          "fullname": {
+            "type": "string",
+            "description": "Họ tên khách hàng"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email khách hàng"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Số điện thoại khách hàng"
+          }
+        }
+      }
+    }
+  }
+}
