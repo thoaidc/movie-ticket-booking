@@ -22,12 +22,7 @@ Nhóm 2:
 
 _Mô tả nghiệp vụ_
 
-Hệ thống đặt vé xem phim cho phép người dùng tìm kếm và đặt vé trực tuyến.
-Người dùng sẽ cũng cấp thông tin cá nhân và lựa chọn suất chiếu, rạp chiếu
-cùng vị trí ghế ngồi mong muốn.Hệ thông kiếm tra xem ghế đã được đặt trước
-hay chưa; nếu ghế không còn trống quy trình sẽ dừng lại. Nếu đặt vé thành
-công, hệ thống sẽ gửi thông báo xác nhận đến người dùng và cập nhật lịch sử
-đặt vé.
+Hệ thống đặt vé xem phim cho phép khách hàng chọn phim, suất chiếu, ghế ngồi và tiến hành đặt vé trực tuyến. Sau khi khách hàng chọn phim, hệ thống sẽ kiểm tra tình trạng chỗ ngồi, xác minh thông tin vé, và xử lý thanh toán. Nếu đặt vé thành công, hệ thống sẽ gửi thông báo xác nhận vé đã đặt đến email của khách hàng.
 
 ---
 
