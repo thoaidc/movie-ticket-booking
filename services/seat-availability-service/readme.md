@@ -3,33 +3,38 @@
 
 ## 📝 Tổng Quan
 
-**Seat Availability Service** có nhiệm vụ kiểm tra tình trạng ghế trống cho các suất chiếu phim trước khi tiến hành đặt vé. 
+**Seat Availability Service** 
+Thực hiện lấy thông tin suất chiếu và ghế ngồi tại phòng chiếu và khởi tạo danh sách ghế cho từng suất chiếu.
+Thực hiện kiểm tra tình trạng ghế trống cho các suất chiếu phim trước khi tiến hành đặt vé. Nếu ghế trống thì tiến hành giữ ghế để đợi
+xác minh thông tin và thanh toán đơn hàng. Xử lý mở lại ghế nếu đặt hàng thất bại hoặc xác nhận ghế đã đặt nếu đặt hàng thành công.
 
 ## Kiến trúc
 
-* Sử dụng Spring Boot, Spring cloud gateway + service discovery
+* Sử dụng Spring Boot, Eureka client để đăng ký vào service discovery
 * MySQL làm cơ sở dữ liệu chính
 * RabbitMQ cho message queue
 * Tích hợp với các dịch vụ khác thông qua HTTP
-* RESTful API design
+* RESTFul API design
 
 ## ⚙️ Thiết Lập
 
-* Được xây dựng dựa trên `Dockerfile` có sẵn.
+* Build dự án với `Dockerfile` tại thư mục gốc dự án.
 * Mã nguồn được đặt trong thư mục `src/`.
 
 ## 👨‍💻 Phát Triển
 
 * Các API được định nghĩa trong file: `docs/api-specs/seat-availability-service.yaml`.
-* Để chạy cục bộ, thực hiện lệnh sau từ thư mục gốc:
+* Khởi chạy đồng thời với các service khác theo cấu hình `docker-compose.yml` với một lệnh duy nhất:
 
   ```bash
-  docker-compose up --build
+  docker-compose up
   ```
 
 ## 🌐 API Endpoint
 
-* Base URL: `http://localhost:8080/`
+* Base URL: 
+* Môi trường dev: `http://localhost:8104/`
+* Với docker: `http://localhost:8080/`
 
 ## 🌐 API chi tiết
 

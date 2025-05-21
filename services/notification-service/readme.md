@@ -4,31 +4,34 @@
 
 ## 📝 Tổng Quan
 
-**Notification Service** chịu trách nhiệm gửi thông báo xác nhận qua email cho khách hàng sau khi đặt vé và thanh toán thành công. 
+**Notification Service** 
+Gọi API tới customer service để lấy thông tin khách hàng đặt vé và gửi thông báo qua email cho khách hàng sau khi đặt vé thành công.
 
 ## Kiến trúc
 
-* Sử dụng Spring Boot, Spring cloud gateway + service discovery
+* Sử dụng Spring Boot, Eureka client để đăng ký vào service discovery
 * MySQL làm cơ sở dữ liệu chính
 * RabbitMQ cho message queue
 * Tích hợp với các dịch vụ khác thông qua HTTP
-* RESTful API design
+* RESTFul API design
 
 ## ⚙️ Thiết Lập
 
-* Được xây dựng bằng `Dockerfile` có sẵn.
+* Build bằng `Dockerfile` tại thư mục gốc dự án.
 * Mã nguồn được đặt trong thư mục `src/`.
 
 ## 👨‍💻 Phát Triển
 
 * Các API được định nghĩa trong file: `docs/api-specs/notification-service.yaml`.
-* Để chạy cục bộ, sử dụng lệnh sau từ thư mục gốc:
+* Khởi chạy đồng thời với các service khác theo cấu hình `docker-compose.yml` với một lệnh duy nhất:
 
   ```bash
-  docker-compose up --build
+  docker-compose up
   ```
 
 ## 🌐 API Endpoint
 
-* Base URL: `http://localhost:8080/`
+* Base URL: 
+* Môi trường dev: `http://localhost:8102/`
+* Với docker: `http://localhost:8080/`
 

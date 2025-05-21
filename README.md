@@ -7,6 +7,10 @@ Dự án này triển khai một hệ thống đặt vé xem phim theo kiến tr
 
 ## 🧩 Tổng Quan Kiến Trúc Hệ Thống
 
+### 🧭 API gateway
+
+* Xử lý định tuyến các request từ client đến các service cụ thể theo tên service trong api.
+
 ### 🧭 Task Service
 
 * **Ticket Booking Service**
@@ -15,10 +19,10 @@ Dự án này triển khai một hệ thống đặt vé xem phim theo kiến tr
 ### 📦 Entity Services
 
 * **Movie Service**
-  Quản lý dữ liệu phim, suất chiếu và tình trạng ghế trống.
+  Quản lý dữ liệu phim, suất chiếu và danh sách ghế của các phòng chiếu.
 
 * **Customer Service**
-  Quản lý thông tin khách hàng và xác minh đặt vé.
+  Quản lý thông tin khách hàng đặt vé.
 
 * **Payment Service**
   Xử lý thanh toán trực tuyến cho vé xem phim.
@@ -26,15 +30,15 @@ Dự án này triển khai một hệ thống đặt vé xem phim theo kiến tr
 ### 🧠 Microservice
 
 * **Seat Availability Service**
-  Kiểm tra tình trạng ghế còn trống trước khi xác nhận đặt vé.
+  Kiểm tra và xác minh tình trạng ghế trống trước khi xác nhận đặt vé.
 
 ### 🛎️ Utility Service
 
 * **Discovery Service**
-  Quản lý việc đăng ký và phát hiện các microservice khác trong hệ thống.
+  Quản lý việc đăng ký và phát hiện các service trong hệ thống, hỗ trợ api gateway định tuyến và các service giao tiếp với nhau.
 
 * **Notification Service**
-  Gửi email xác nhận cho khách hàng sau khi đặt vé và thanh toán thành công.
+  Gửi email thông báo cho khách hàng sau khi đặt vé thành công.
 
 ---
 
@@ -60,4 +64,3 @@ Dự án này triển khai một hệ thống đặt vé xem phim theo kiến tr
 ```bash
 docker-compose up
 ```
-
