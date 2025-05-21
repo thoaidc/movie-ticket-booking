@@ -31,6 +31,7 @@ Nếu đặt vé thành công, hệ thống sẽ gửi thông báo xác nhận v
 ## 2. 🧩 Xác định các Microservice
 
 _Xác định các thực thể_
+
 **Đối tượng sử dụng**
 - Khách hàng cá nhân
 
@@ -49,147 +50,95 @@ _Thiết kế thực thể_
 
 
 _Thiết kế những dịch vụ_
-Ta sẽ đi qua phân tích quy trình nghiệp vụ của dự án này và lọc những logic nghiệp vụ mà sẽ có thể cho vào những thực thể khác nhau để ta có thể đưa ra những đối tượng dịch vụ khả quan của hệ thống.
 
 **Đặt vé xem phim**
 
-1.Bắt đầu quy trình đặt vé: Khách hàng truy cập hệ thống và bắt đầu quy trình đặt vé xem phim.
+1. Bắt đầu quy trình đặt vé: Khách hàng truy cập hệ thống và bắt đầu quy trình đặt vé xem phim.
 
-2.Chọn phim và suất chiếu: Khách hàng chọn phim muốn xem, cùng với suất chiếu và rạp phim cụ thể.
+2. Chọn phim và suất chiếu: Khách hàng chọn phim muốn xem, cùng với suất chiếu.
 
-3.Chọn ghế ngồi: Khách hàng chọn ghế ngồi từ danh sách các ghế còn trống.
+3. Chọn ghế ngồi: Khách hàng chọn ghế ngồi từ danh sách các ghế còn trống.
 
-4.Xác minh ghế ngồi còn trống: Hệ thống kiểm tra tình trạng ghế ngồi đã được chọn xem còn trống hay đã có người đặt.
+4. Tạo đơn hàng với trạng thái đang xử lý và xác minh thông tin phim, suất chiếu và ghế ngồi còn trống:
+Hệ thống kiểm tra tình trạng ghế ngồi đã được chọn xem còn trống hay đã có người đặt.
 
-5.Nếu không còn ghế ngồi, kết thúc quy trình: Nếu ghế đã được đặt bởi người khác, hệ thống thông báo và dừng quy trình.
+5. Nếu không còn ghế ngồi, kết thúc quy trình: Nếu ghế đã được đặt bởi người khác, hệ thống thông báo và dừng quy trình.
 
-6.Nhập thông tin khách hàng: Khách hàng cung cấp các thông tin cá nhân như họ tên, số điện thoại và email.
+6. Nhập thông tin khách hàng: Khách hàng cung cấp các thông tin cá nhân như họ tên, số điện thoại và email.
 
-7.Xác minh thông tin vé: Hệ thống xác minh thông tin vé xem phim và các chi tiết liên quan.
+7. Xác minh thông khách hàng: Hệ thống xác minh thông tin khách hàng và lưu vào cơ sở dữ liệu.
 
-8.Nhập và thực hiện thanh toán: Khách hàng tiến hành thanh toán trực tuyến thông qua các cổng thanh toán.
+8. Nhập và thực hiện thanh toán: Khách hàng tiến hành thanh toán.
 
-9.Nếu thanh toán thành công, gửi thông báo xác nhận: Nếu giao dịch thành công, hệ thống gửi thông báo xác nhận vé đã đặt đến email của khách hàng.
+9. Nếu thanh toán thành công, cập nhật tình trạng ghế ngồi: Hệ thống cập nhật tình trạng ghế đã được đặt vào cơ sở dữ liệu.
 
-10.Cập nhật tình trạng ghế ngồi: Hệ thống cập nhật tình trạng ghế đã được đặt vào cơ sở dữ liệu.
-
-11.Lưu thông tin vé và khách hàng vào cơ sở dữ liệu: Hệ thống lưu thông tin vé đã đặt và thông tin khách hàng vào cơ sở dữ liệu để quản lý
-
-
-
-| Tên dịch vụ                   | Trách nhiệm                        | Công nghệ   | CSDL    | Giao thức |
-|-------------------------------|------------------------------------|-------------|---------|-----------|
-| **customer-service**          | Quản lý người dùng                 | RESTFUL API | MySQL   | REST      |
-| **movie-service**             | Quản lý phim, suất chiếu, chỗ ngồi | RESTFUL API | MySQL   | REST      |
-| **ticket-booking-service**    | Xử lý đặt vé                       | RESTFUL API | MySQL   | REST      |
-| **seat-availability-service** | Kiểm tra tình trạng ghế            | RESTFUL API | MySQL   | REST      |
-| **notification-service**      | Gửi email thông báo                | RESTFUL API | MySQL   | REST      |
-| **payment-service**           | Xử lý thanh toán                   | RESTFUL API | MySQL   | REST      |
+10. Xác nhận hoàn thành đơn hàng và gửi email thông báo cho khách hàng. Nếu xác nhận thất bại thì gửi yêu cầu hoàn tiền và hủy đặt ghế.
 
 
 ## 3. 🔄 Giao tiếp giữa các dịch vụ
 
 ### **Cơ chế chính**
-![flow](../docs/assets/flow.jpg
-)
+![flow](../docs/assets/flow.jpg)
 
 
-### **Chi tiết các kênh kết nối**
-| **Kết nối**                 | **Protocol** | **Mục đích**                  |  
-|-----------------------------|--------------|-------------------------------|  
-| Client ↔ API Gateway        | HTTP/REST    | Tất cả request từ client      |  
-| API Gateway ↔ Core Services | HTTP/REST    | Định tuyến request            |  
-| Booking ↔ Seat Availability | HTTP/REST    | Kiểm tra ghế trống            |  
-| Booking ↔ Notification      | RabbitMQ     | Gửi thông báo không đồng bộ   |  
-| Booking ↔ Booking History   | HTTP/REST    | Ghi log đồng bộ               |  
+#### Service Candidates:
 
-
----
-
-## 4. 🗂️ Thiết kế dữ liệu chính
-
-
-
----
-
-## 5. 🛠️ Triển khai service
-
-### **Cấu trúc thư mục**
-```
-services/
-├── user-service/
-│ ├── app/
-│ │ ├── core/ # Chứa các file cài đặt
-│ │ ├── api/ # Xử lý route
-│ │ ├── models.py # Mô hình SQLAlchemy
-│ │ ├── schemas.py # Mô hình Pydantic
-│ │ └── main.py # Ứng dụng FastAPI 
-│ ├── migrations/ # Alembic migrations
-│ └── Dockerfile
-├── booking-history-service/
-├── hotel-service/
-├── notification-service/
-├── room-availability-service/
-├── booking-service/
-gateway/
-├── nginx.conf # Reverse proxy rules
-└── Dockerfile
-deploy/
-├── docker-compose.yml # Multi-container setup
-└── .env # Environment variables
-```
-
-### **Cơ sở dữ liệu của từng dịch vụ**
-| Service                     | Database |
-|-----------------------------|----------|
-| `customer service`          | MySQL    |  
-| `movie service`             | MySQL    |
-| `ticket booking service`    | MySQL    | 
-| `seat availability service` | MySQL    | 
-| `payment service`           | MySQL    | 
-| `notification service`      | MySQL    |
-
-
----
-
-## 6. 📦 Deployment với Docker
-
-### **Quy trình triển khai**
-1. **Build images**:
-   ```bash
-   docker-compose build
-   ```
-2. **Khởi động hệ thống**:
-   ```bash
-   docker-compose up -d
-   ```
-3. **Kiểm tra trạng thái**:
-   ```bash
-   docker-compose ps
-   ```
-4. **(Optional) Scale service**:
-   ```bash
-   docker-compose up -d --scale user-service=3
-   ```
-
----
+| **Service**                | **Mô tả chức năng**                                               |
+|----------------------------|-------------------------------------------------------------------|
+| API Gateway                | Định tuyến request từ client đến các service phù hợp              |
+| Ticket Booking Service     | Xử lý toàn bộ quy trình đặt vé, điều phối giữa các service        |
+| Movie Service              | Quản lý thông tin phim, suất chiếu và danh sách ghế               |
+| Customer Service           | Quản lý thông tin khách hàng                                      |
+| Payment Service            | Xử lý thanh toán trực tuyến                                       |
+| Seat Availability Service  | Kiểm tra tình trạng ghế trống trước khi đặt vé                    |
+| Notification Service       | Gửi thông báo xác nhận đặt vé cho khách hàng qua email            |
+| Discovery Service          | Cho phép các service đăng ký và phát hiện nhau (service registry) |
 
 
 
-## 7. Ưu điểm kiến trúc
+#### Service Capabilities:
 
-**Ưu điểm:**
-- **Dễ mở rộng**: Scale riêng từng service (vd: Notification Service khi có khuyến mãi)
-- **Độ tin cậy**: Lỗi 1 service không ảnh hưởng toàn hệ thống
-- **Bảo trì dễ**: Chuẩn hóa trên FastAPI, database tách biệt
+| **Service**               | **Chức năng chính**                                                                          |
+|---------------------------|----------------------------------------------------------------------------------------------|
+| API Gateway               | - Định tuyến request                                                                         |
+| Ticket Booking Service    | - Chọn phim, suất chiếu, ghế<br>- Xác minh khách hàng<br>- Gọi thanh toán<br>- Gửi thông báo |
+| Movie Service             | - Quản lý thông tin rạp, phim, phòng chiếu, suất chiếu, danh sách ghế của phòng              |
+| Customer Service          | - Quản lý thông tin khách hàng<br>- Xác minh thông tin khi đặt vé                            |
+| Payment Service           | - Xử lý yêu cầu thanh toán                                                                   |
+| Seat Availability Service | - Kiểm tra và xác minh tình trạng ghế trống trong suất chiếu cụ thể                          |
+| Notification Service      | - Nhận message từ hàng đợi<br>- Gửi email thông báo xác nhận                                 |
+| Discovery Service         | - Đăng ký service<br>- Phát hiện service khác (Eureka registry)                              |
 
-**Nhược điểm:**
-- **Phức tạp vận hành**: Quản lý nhiều DB (PostgreSQL, Redis, MongoDB, RabbitMQ)
-- **Khó đồng bộ**: Giao dịch xuyên service cần Saga Pattern
-- **Giám sát phức tạp**: Cần tool theo dõi request qua nhiều service
-- **Chi phí network**: Giao tiếp liên service tăng overhead
 
-**Phù hợp khi:**
-- Cần scale theo từng tính năng
-- Team có kinh nghiệm DevOps
-- Ưu tiên khả năng chịu tải cao
+
+#### Interactions:
+
+| **Kết nối**                                        | **Protocol** | **Mục đích**                                                                       |
+|----------------------------------------------------|--------------|------------------------------------------------------------------------------------|
+| Client ↔ API Gateway                               | HTTP/REST    | Tất cả request từ client                                                           |
+| API Gateway ↔ Ticket Booking Service               | HTTP/REST    | Định tuyến yêu cầu đặt vé                                                          |
+| API Gateway ↔ Movie Service                        | HTTP/REST    | Lấy thông tin phim, suất chiếu, ghế                                                |
+| API Gateway ↔ Seat availability Service            | HTTP/REST    | Lấy thông tin tình trạng ghế ngồi của suất chiếu                                   |
+| Ticket Booking Service ↔ Movie Service             | RabbitMQ     | Lấy thông tin phim, rạp, suất chiếu, danh sách ghế                                 |
+| Seat Availability Service ↔ Movie Service          | HTTP/REST    | Lấy thông tin ghế ngồi và khởi tạo trạng thái                                      |
+| Ticket Booking Service ↔ Seat Availability Service | RabbitMQ     | Kiểm tra ghế trống trước khi đặt, giữ hoặc bỏ giữ ghế, xác nhận tình trạng đặt ghế |
+| Ticket Booking Service ↔ Payment Service           | RabbitMQ     | Gửi yêu cầu thanh toán                                                             |
+| Ticket Booking Service ↔ Customer Service          | RabbitMQ     | Xác minh/ghi nhận thông tin khách hàng                                             |
+| Ticket Booking Service ↔ Customer Service          | HTTP/REST    | Lấy thông tin khách hàng                                                           |
+| Ticket Booking Service ↔ Notification Service      | RabbitMQ     | Gửi thông báo không đồng bộ sau khi đặt vé                                         |
+| Notification Service ↔ Customer Service            | HTTP/REST    | Lấy thông tin khách hàng                                                           |
+| Các Services ↔ Discovery Service                   | Eureka       | Đăng ký & phát hiện service                                                        |
+
+
+
+#### Data Ownership:
+
+| **Service**                  | **Dữ liệu sở hữu**                                                               |
+|------------------------------|----------------------------------------------------------------------------------|
+| Movie Service                | - Danh sách phim, rạp, suất chiếu, phòng chiếu, danh sách ghế                    |
+| Customer Service             | - Thông tin khách hàng                                                           |
+| Payment Service              | - Giao dịch thanh toán                                                           |
+| Ticket Booking Service       | - Thông tin đơn đặt vé tạm thời<br>- Liên kết khách hàng – ghế – phim - payment  |
+| Seat Availability Service    | - Trạng thái ghế theo suất chiếu                                                 |
+| Notification Service         | - Nhật ký gửi thông báo                                                          |
+
