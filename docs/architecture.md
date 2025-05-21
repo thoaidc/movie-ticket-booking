@@ -26,7 +26,7 @@ cho một chức năng nghiệp vụ cụ thể, cùng với một API Gateway �
 - **Tương tác với CSDL/nơi lưu trữ dữ liệu**: Mỗi service tương tác với cơ sở dữ liệu riêng của nó sử dụng MySQL.
 
 ## Thiết kế
-![Microservice](../docs/assets/microservices.jpg)
+![Microservice](../docs/assets/microservices.png)
 ## Khả năng mở rộng & chịu lỗi
 - **Khả năng mở rộng**:
     - Từng microservice có thể được scale độc lập dựa trên tải (ví dụ: scale `notification-service` trong mùa cao điểm khuyến mãi).
